@@ -1,22 +1,23 @@
-import React, { useState } from 'react';
+import { styles } from "@/styles/authstyles";
+import { useSignIn } from "@clerk/clerk-expo";
+import { Link, useRouter } from "expo-router";
+import React, { useState } from "react";
 import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
   Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-} from 'react-native';
-import { useSignIn } from '@clerk/clerk-expo';
-import { Link } from 'expo-router';
-import { styles } from '@/styles/authstyles';
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function LoginScreen() {
+  const router = useRouter();
   const { signIn, setActive, isLoaded } = useSignIn();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSignIn = async () => {
@@ -29,11 +30,12 @@ export default function LoginScreen() {
         password,
       });
 
-      if (completeSignIn.status === 'complete') {
+      if (completeSignIn.status === "complete") {
         await setActive({ session: completeSignIn.createdSessionId });
+        router.replace("/(screen)/profile");
       }
     } catch (err) {
-      Alert.alert('Error', err?.errors[0]?.message);
+      Alert.alert("Error", err?.errors[0]?.message);
     } finally {
       setLoading(false);
     }
@@ -42,7 +44,7 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.formContainer}>
@@ -80,13 +82,13 @@ export default function LoginScreen() {
             disabled={loading}
           >
             <Text style={styles.buttonText}>
-              {loading ? 'Signing In...' : 'Sign In'}
+              {loading ? "Signing In..." : "Sign In"}
             </Text>
           </TouchableOpacity>
 
           <View style={styles.linkContainer}>
             <Text style={styles.linkText}>
-              Don't have an account?{' '}
+              Don't have an account?{" "}
               <Link href="/signup" style={styles.linkHighlight}>
                 Sign Up
               </Link>

@@ -10,11 +10,28 @@ import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "react-native";
 import "react-native-reanimated";
 
+function ConditionalStack() {
+  const { isSignedIn, isLoaded } = useAuth();
+
+  if (!isLoaded) {
+    // Optionally, show a splash/loading screen here
+    return null;
+  }
+
+  return (
+    <Stack>
+      {isSignedIn ? (
+        <Stack.Screen name="(screen)" options={{ headerShown: false }} />
+      ) : (
+        <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+      )}
+      <Stack.Screen name="+not-found" />
+    </Stack>
+  );
+}
+
 export default function RootLayout() {
   const colorScheme = useColorScheme();
-  // const [loaded] = useFonts({
-  //   SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
-  // });
 
   return (
     <ClerkProvider
@@ -22,35 +39,9 @@ export default function RootLayout() {
       publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
     >
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <InitialLayout />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <ConditionalStack />
         <StatusBar style="auto" />
       </ThemeProvider>
     </ClerkProvider>
-  );
-}
-
-function InitialLayout() {
-  const { isLoaded, isSignedIn } = useAuth();
-
-  if (!isLoaded) {
-    return null; 
-  }
-
-  return (
-    <Stack screenOptions={{ headerShown: false }}>
-      {isSignedIn ? (
-        <>
-          <Stack.Screen name="(screen)/profile" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </>
-      ) : (
-        <>
-          <Stack.Screen name="(auth)/login" options={{ headerShown: false }} />
-        </>
-      )}
-    </Stack>
   );
 }

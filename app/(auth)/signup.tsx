@@ -1,5 +1,6 @@
+import { styles } from "@/styles/authstyles";
 import { useSignUp } from "@clerk/clerk-expo";
-import { Link } from "expo-router";
+import { Link, router, useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Alert,
@@ -11,8 +12,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { styles } from "@/styles/authstyles";
-
 
 export default function SignupScreen() {
   const { signUp, setActive, isLoaded } = useSignUp();
@@ -25,40 +24,106 @@ export default function SignupScreen() {
   const [loading, setLoading] = useState(false);
 
   const handleSignUp = async () => {
-    if (!isLoaded) return;
+    const router = useRouter();
+    
+
+    if (!isLoaded) {
+      return;
+    }
+
+    // Validation
+    if (!email || !password || !firstName || !lastName) {
+      Alert.alert("Error", "Please fill in all fields");
+      return;
+    }
+
+    if (!email.includes("@")) {
+      Alert.alert("Error", "Please enter a valid email address");
+      return;
+    }
+
+    if (password.length < 8) {
+      Alert.alert("Error", "Password must be at least 8 characters long");
+      return;
+    }
 
     setLoading(true);
+
     try {
-      await signUp.create({
+
+      const signUpResponse = await signUp.create({
         emailAddress: email,
         password,
         firstName,
         lastName,
       });
 
+
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+
       setPendingVerification(true);
     } catch (err) {
-      Alert.alert("Error", err?.errors[0].message);
+    
+
+      // Better error handling
+      let errorMessage = "An unexpected error occurred";
+
+      if (err?.errors && err.errors.length > 0) {
+        errorMessage = err.errors[0].message;
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+
+      Alert.alert("Signup Error", errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
   const handleVerifyEmail = async () => {
-    if (!isLoaded) return;
+
+    if (!isLoaded) {
+      return;
+    }
+
+    if (!code || code.length !== 6) {
+      Alert.alert("Error", "Please enter a valid 6-digit code");
+      return;
+    }
 
     setLoading(true);
+
     try {
+
       const completeSignUp = await signUp.attemptEmailAddressVerification({
         code,
       });
 
+
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
+        router.replace("/(screen)/profile");
+      } else {
+        
+        Alert.alert("Error", "Verification failed. Please try again.");
       }
     } catch (err) {
-      Alert.alert("Error", err?.errors[0].message);
+      console.error("Verification error details:", {
+        error: err,
+        message: err?.message,
+        errors: err?.errors,
+        status: err?.status,
+      });
+
+      let errorMessage = "Verification failed";
+
+      if (err?.errors && err.errors.length > 0) {
+        errorMessage = err.errors[0].message;
+      } else if (err?.message) {
+        errorMessage = err.message;
+      }
+
+      Alert.alert("Verification Error", errorMessage);
     } finally {
       setLoading(false);
     }
