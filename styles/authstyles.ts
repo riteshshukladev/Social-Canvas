@@ -1,15 +1,12 @@
 import { StyleSheet } from 'react-native';
 
 export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f8f9fa',
-  },
-  scrollContainer: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
+  
+  // scrollContainer: {
+  //   flexGrow: 1,
+  //   justifyContent: 'center',
+  //   padding: 20,
+  // },
   formContainer: {
     backgroundColor: '#fff',
     padding: 30,
@@ -169,4 +166,82 @@ export const styles = StyleSheet.create({
   darkButtonText: {
     color: '#ffffff',
   },
+
+  separatorContainer: {
+  flexDirection: "row",
+  alignItems: "center",
+  marginVertical: 20,
+},
+// The line on either side of the OR text
+separatorLine: {
+  flex: 1,
+  height: 1,
+  backgroundColor: "#E0E0E0", // A light gray
+},
+// The OR text itself
+separatorText: {
+  marginHorizontal: 10,
+  color: "#888",
+  fontWeight: "600",
+},
+// Container for the SSO buttons
+ssoContainer: {
+  width: '100%',
+  gap: 15, // Creates space between the buttons
+},
+// Individual SSO button style
+ssoButton: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'center',
+  paddingVertical: 14,
+  paddingHorizontal: 20,
+  borderRadius: 8,
+  borderWidth: 1,
+  borderColor: '#E0E0E0',
+  backgroundColor: '#FFFFFF', // White background
+  width: '100%',
+},
+// SSO button text style
+ssoButtonText: {
+  marginLeft: 10, // Space between icon and text
+  fontSize: 16,
+  fontWeight: '600',
+  color: '#333',
+  },
+loadingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 1000,
+  },
+  loadingContent: {
+    backgroundColor: '#fff',
+    padding: 30,
+    borderRadius: 15,
+    alignItems: 'center',
+    minWidth: 200,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  loadingText: {
+    marginTop: 16,
+    fontSize: 16,
+    color: '#333',
+    textAlign: 'center',
+    fontWeight: '500',
+  },
 });
+
+

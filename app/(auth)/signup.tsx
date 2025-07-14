@@ -1,7 +1,9 @@
+import { SSOButtons } from "@/components/SSOButtons";
+import { useWarmUpBrowser } from "@/hooks/useWarmUpBrowser";
 import { styles } from "@/styles/authstyles";
-import { useSignUp } from "@clerk/clerk-expo";
-import { Link, router, useRouter } from "expo-router";
-import React, { useState } from "react";
+import { useAuth, useOAuth, useSignUp } from "@clerk/clerk-expo";
+import { Link, useRouter } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   KeyboardAvoidingView,
@@ -14,115 +16,115 @@ import {
 } from "react-native";
 
 export default function SignupScreen() {
+  useWarmUpBrowser();
+
+  const router = useRouter();
   const { signUp, setActive, isLoaded } = useSignUp();
+  const { isSignedIn } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+
   const [code, setCode] = useState("");
   const [pendingVerification, setPendingVerification] = useState(false);
+
   const [loading, setLoading] = useState(false);
 
-  const handleSignUp = async () => {
-    const router = useRouter();
-    
+  const { startOAuthFlow: startGoogleOAuthFlow } = useOAuth({
+    strategy: "oauth_google",
+  });
+  const { startOAuthFlow: startGitHubOAuthFlow } = useOAuth({
+    strategy: "oauth_github",
+  });
 
-    if (!isLoaded) {
-      return;
+  useEffect(() => {
+    if (isSignedIn) {
+      router.replace("/(screen)/profile");
     }
+  }, [isSignedIn, router]);
 
-    // Validation
+  const handleSignUp = async () => {
+    if (!isLoaded) return;
+
     if (!email || !password || !firstName || !lastName) {
       Alert.alert("Error", "Please fill in all fields");
       return;
     }
 
-    if (!email.includes("@")) {
-      Alert.alert("Error", "Please enter a valid email address");
-      return;
-    }
-
-    if (password.length < 8) {
-      Alert.alert("Error", "Password must be at least 8 characters long");
-      return;
-    }
-
     setLoading(true);
-
     try {
-
-      const signUpResponse = await signUp.create({
+      await signUp.create({
         emailAddress: email,
         password,
         firstName,
         lastName,
       });
 
-
+      // Start the email verification process
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
-
       setPendingVerification(true);
     } catch (err) {
-    
-
-      // Better error handling
-      let errorMessage = "An unexpected error occurred";
-
-      if (err?.errors && err.errors.length > 0) {
-        errorMessage = err.errors[0].message;
-      } else if (err?.message) {
-        errorMessage = err.message;
-      }
-
+      const errorMessage =
+        err?.errors?.[0]?.message || "An unexpected error occurred.";
       Alert.alert("Signup Error", errorMessage);
     } finally {
       setLoading(false);
     }
   };
 
+  // Handler for SSO (Google, GitHub)
+  const handleSSOAuth = useCallback(
+    async (strategy) => {
+      try {
+        const selectedOAuthFlow =
+          strategy === "oauth_google"
+            ? startGoogleOAuthFlow
+            : startGitHubOAuthFlow;
+
+        const { createdSessionId, setActive } = await selectedOAuthFlow();
+
+        if (createdSessionId) {
+          // If the user has a session, they are signed in
+          setActive({ session: createdSessionId });
+          // setTimeout(() => {
+          //   router.dismissAll();
+          //   router.replace("/(screen)/profile");
+          // }, 100);
+        }
+      } catch (err) {
+        console.error("OAuth error", err);
+        const errorMessage =
+          err?.errors?.[0]?.message ||
+          "An error occurred during SSO authentication.";
+        Alert.alert("SSO Error", errorMessage);
+      }
+    },
+    [startGoogleOAuthFlow, startGitHubOAuthFlow, setActive, router]
+  );
+
+  // Handler for verifying the email code
   const handleVerifyEmail = async () => {
-
-    if (!isLoaded) {
-      return;
-    }
-
+    if (!isLoaded) return;
     if (!code || code.length !== 6) {
       Alert.alert("Error", "Please enter a valid 6-digit code");
       return;
     }
-
     setLoading(true);
-
     try {
-
       const completeSignUp = await signUp.attemptEmailAddressVerification({
         code,
       });
 
-
       if (completeSignUp.status === "complete") {
         await setActive({ session: completeSignUp.createdSessionId });
-        router.replace("/(screen)/profile");
+        router.push("/(screen)/profile");
       } else {
-        
         Alert.alert("Error", "Verification failed. Please try again.");
       }
     } catch (err) {
-      console.error("Verification error details:", {
-        error: err,
-        message: err?.message,
-        errors: err?.errors,
-        status: err?.status,
-      });
-
-      let errorMessage = "Verification failed";
-
-      if (err?.errors && err.errors.length > 0) {
-        errorMessage = err.errors[0].message;
-      } else if (err?.message) {
-        errorMessage = err.message;
-      }
-
+      const errorMessage = err?.errors?.[0]?.message || "Verification failed.";
       Alert.alert("Verification Error", errorMessage);
     } finally {
       setLoading(false);
@@ -188,6 +190,17 @@ export default function SignupScreen() {
           <Text style={styles.title}>Create Account</Text>
           <Text style={styles.subtitle}>Sign up to get started</Text>
 
+          {/* SSO Buttons are the primary option */}
+          <SSOButtons handleSSOAuth={handleSSOAuth} />
+
+          {/* Separator for clarity */}
+          <View style={styles.separatorContainer}>
+            <View style={styles.separatorLine} />
+            <Text style={styles.separatorText}>OR SIGN UP WITH EMAIL</Text>
+            <View style={styles.separatorLine} />
+          </View>
+
+          {/* Email/Password Form */}
           <View style={styles.row}>
             <View style={[styles.inputContainer, styles.halfWidth]}>
               <Text style={styles.label}>First Name</Text>
@@ -199,7 +212,6 @@ export default function SignupScreen() {
                 autoComplete="given-name"
               />
             </View>
-
             <View style={[styles.inputContainer, styles.halfWidth]}>
               <Text style={styles.label}>Last Name</Text>
               <TextInput
@@ -229,7 +241,7 @@ export default function SignupScreen() {
             <Text style={styles.label}>Password</Text>
             <TextInput
               style={styles.input}
-              placeholder="Create a password"
+              placeholder="Create a password (min. 8 chars)"
               value={password}
               onChangeText={setPassword}
               secureTextEntry

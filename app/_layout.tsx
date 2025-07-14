@@ -7,15 +7,26 @@ import {
 } from "@react-navigation/native";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useColorScheme } from "react-native";
+import { ActivityIndicator, useColorScheme, View } from "react-native";
 import "react-native-reanimated";
+import "../styles/global.css"; // Ensure global styles are imported
 
 function ConditionalStack() {
   const { isSignedIn, isLoaded } = useAuth();
 
   if (!isLoaded) {
-    // Optionally, show a splash/loading screen here
-    return null;
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#ffffff",
+        }}
+      >
+        <ActivityIndicator size="large" color="#0066CC" />
+      </View>
+    );
   }
 
   return (
@@ -25,7 +36,13 @@ function ConditionalStack() {
       ) : (
         <Stack.Screen name="(auth)" options={{ headerShown: false }} />
       )}
-      <Stack.Screen name="+not-found" />
+      <Stack.Screen
+        name="+not-found"
+        options={{
+          headerShown: false,
+          presentation: "modal", // This can help with smoother transitions
+        }}
+      />
     </Stack>
   );
 }
