@@ -1,6 +1,5 @@
 import { SSOButtons } from "@/components/SSOButtons";
 import { useWarmUpBrowser } from "@/hooks/useWarmUpBrowser";
-import { styles } from "@/styles/authstyles";
 import { useAuth, useOAuth, useSignUp } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -135,7 +134,7 @@ export default function SignupScreen() {
   if (pendingVerification) {
     return (
       <KeyboardAvoidingView
-        className="flex-1 bg-gray-100"
+        className="flex-1"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
         <ScrollView
@@ -146,16 +145,17 @@ export default function SignupScreen() {
             padding: 8,
           }}
         >
-          <View style={styles.formContainer}>
-            <Text style={styles.title}>Verify Your Email</Text>
-            <Text style={styles.subtitle}>
-              We've sent a verification code to {email}
+          <View className="px-10 py-12 border  rounded-3xl bg-black shadow-md">
+            <Text className="text-3xl mb-2 text-center pb-0 text-white tracking-wide font-sftmedium">
+              Verify Your Email
+            </Text>
+            <Text className="text-sm font-normal text-center text-[#8A8888] tracking-wide font-sftlight">
+              We've sent a verification code to your email.
             </Text>
 
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Verification Code</Text>
+            <View className=" shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide w-full rounded-lg my-8">
               <TextInput
-                style={styles.input}
+                className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm font-sftregular"
                 placeholder="Enter 6-digit code"
                 value={code}
                 onChangeText={setCode}
@@ -165,21 +165,21 @@ export default function SignupScreen() {
             </View>
 
             <TouchableOpacity
-              style={[styles.button, loading && styles.buttonDisabled]}
+              className="w-full py-4 px-5 bg-transparent rounded-lg shadow-md text-base border border-[rgba(255,255,255,0.15)] tracking-wide items-center my-0"
               onPress={handleVerifyEmail}
               disabled={loading}
             >
-              <Text style={styles.buttonText}>
+              <Text className="text-[rgba(255,255,255,0.75)] font-normal font-sftregular text-base">
                 {loading ? "Verifying..." : "Verify Email"}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.linkContainer}
+              className="mt-5 items-center"
               onPress={() => setPendingVerification(false)}
             >
-              <Text style={styles.linkText}>
-                <Text style={styles.linkHighlight}>← Back to Sign Up</Text>
+              <Text className="text-sm font-normal text-center text-[#f3f3f3] tracking-wide">
+                <Text className="font-sftlight"> Back to Sign Up?</Text>
               </Text>
             </TouchableOpacity>
           </View>
@@ -190,7 +190,7 @@ export default function SignupScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="flex-1 bg-gray-100"
+      className="flex-1"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
@@ -201,20 +201,23 @@ export default function SignupScreen() {
           padding: 8,
         }}
       >
-        <View className="px-10 py-16 border border-gray-300 rounded-3xl bg-black shadow-md">
+        <View className="px-10 py-12 border rounded-3xl bg-black shadow-md">
           <View className="flex flex-col items-center justify-center mb-6 tracking-wide">
-            <Image src="" className="" />
+            <Image
+              source={require("../../assets/images/main-icon/main-logo-sec.png")}
+              style={{ width: 50, height: 50, marginBottom: 16 }}
+            />
 
-            <Text className="text-3xl font-bold mb-2 text-center pb-0 text-white tracking-wide">
+            <Text className="text-3xl mb-2 text-center pb-0 text-white tracking-wide font-sftmedium">
               Create new Account
             </Text>
-            <Text className="text-sm font-normal text-center text-[#8A8888] tracking-wide">
-              already have an account?{" "}
+            <Text className="text-sm font-normal text-center text-[#8A8888] tracking-wide font-sftlight">
+              have an account?{" "}
               <Link
-                className="text-[#1E90FF] font-semibold text-[#E6E6E6]"
+                className="text-[#1E90FF] text-[#E6E6E6]"
                 href="/(auth)/login"
               >
-                sign up.
+                sign in.
               </Link>
             </Text>
           </View>
@@ -224,7 +227,7 @@ export default function SignupScreen() {
             <View className="flex flex-row justify-between">
               <View className=" shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide w-[49%] rounded-lg">
                 <TextInput
-                  className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm"
+                  className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm font-sftregular"
                   placeholder="First name"
                   value={firstName}
                   onChangeText={setFirstName}
@@ -233,7 +236,7 @@ export default function SignupScreen() {
               </View>
               <View className="shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide w-[49%] rounded-lg">
                 <TextInput
-                  className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm"
+                  className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm font-sftregular"
                   placeholder="Last name"
                   value={lastName}
                   onChangeText={setLastName}
@@ -245,7 +248,7 @@ export default function SignupScreen() {
             <View className="flex flex-col items-center justify-center gap-6">
               <View className="w-full rounded-lg shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide">
                 <TextInput
-                  className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm"
+                  className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm font-sftregular"
                   placeholder="Enter your email"
                   value={email}
                   onChangeText={setEmail}
@@ -257,7 +260,7 @@ export default function SignupScreen() {
 
               <View className="w-full rounded-lg shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide">
                 <TextInput
-                  className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm"
+                  className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm font-sftregular"
                   placeholder="Create a password (min. 8 chars)"
                   value={password}
                   onChangeText={setPassword}
@@ -274,7 +277,7 @@ export default function SignupScreen() {
             onPress={handleSignUp}
             disabled={loading}
           >
-            <Text className="text-[rgba(255,255,255,0.75)] font-normal text-base">
+            <Text className="text-[rgba(255,255,255,0.75)] font-normal font-sftregular text-base">
               {loading ? "Creating Account..." : "Sign Up"}
             </Text>
           </TouchableOpacity>

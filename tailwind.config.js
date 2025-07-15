@@ -1,4 +1,3 @@
-/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     "./App.tsx",
@@ -8,7 +7,18 @@ module.exports = {
   ],
   presets: [require("nativewind/preset")],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        sftregular: ["SFT-regular"],
+        sftmedium: ["SFT-medium"],
+        sftbold: ["SFT-bold"],
+        sftlight: ["SFT-light"],
+        sftextralight: ["SFT-extralight"],
+        sftextrabold: ["SFT-extrabold"],
+        sftdemibold: ["SFT-demibold"],
+        sftblack: ["SFT-black"],
+      },
+    },
   },
   plugins: [],
 };

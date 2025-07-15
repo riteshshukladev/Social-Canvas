@@ -11,7 +11,9 @@ export const SSOButtons: React.FC<SSOButtonsProps> = ({ handleSSOAuth }) => {
     <>
       <View className="flex flex-row items-center justify-center my-8">
         <View className="flex-1 h-[.8] bg-gray-300 opacity-60" />
-        <Text className="mx-3 text-sm text-white opacity-50">OR</Text>
+        <Text className="mx-3 text-sm text-white opacity-60 font-sftlight">
+          OR
+        </Text>
         <View className="flex-1 h-[.8] bg-gray-300 opacity-60" />
       </View>
 
@@ -20,7 +22,9 @@ export const SSOButtons: React.FC<SSOButtonsProps> = ({ handleSSOAuth }) => {
           style={styles.ssoButton}
           onPress={() => handleSSOAuth("oauth_google")}
         >
-          <Text style={styles.ssoButtonText}>Single Sign On (SSO)</Text>
+          <Text style={styles.ssoButtonText} className="font-sftregular">
+            Single Sign On (SSO)
+          </Text>
         </TouchableOpacity>
       </View>
     </>
