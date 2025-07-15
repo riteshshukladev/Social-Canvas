@@ -6,6 +6,7 @@ import { Link, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
+  Image,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -134,10 +135,17 @@ export default function SignupScreen() {
   if (pendingVerification) {
     return (
       <KeyboardAvoidingView
-        style={styles.container}
+        className="flex-1 bg-gray-100"
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <ScrollView
+          className="flex-1"
+          contentContainerStyle={{
+            justifyContent: "center",
+            flexGrow: 1,
+            padding: 8,
+          }}
+        >
           <View style={styles.formContainer}>
             <Text style={styles.title}>Verify Your Email</Text>
             <Text style={styles.subtitle}>
@@ -182,91 +190,104 @@ export default function SignupScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      className="flex-1 bg-gray-100"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.formContainer}>
-          <Text style={styles.title}>Create Account</Text>
-          <Text style={styles.subtitle}>Sign up to get started</Text>
+      <ScrollView
+        className="flex-1"
+        contentContainerStyle={{
+          justifyContent: "center",
+          flexGrow: 1,
+          padding: 8,
+        }}
+      >
+        <View className="px-10 py-16 border border-gray-300 rounded-3xl bg-black shadow-md">
+          <View className="flex flex-col items-center justify-center mb-6 tracking-wide">
+            <Image src="" className="" />
 
-          {/* SSO Buttons are the primary option */}
-          <SSOButtons handleSSOAuth={handleSSOAuth} />
-
-          {/* Separator for clarity */}
-          <View style={styles.separatorContainer}>
-            <View style={styles.separatorLine} />
-            <Text style={styles.separatorText}>OR SIGN UP WITH EMAIL</Text>
-            <View style={styles.separatorLine} />
+            <Text className="text-3xl font-bold mb-2 text-center pb-0 text-white tracking-wide">
+              Create new Account
+            </Text>
+            <Text className="text-sm font-normal text-center text-[#8A8888] tracking-wide">
+              already have an account?{" "}
+              <Link
+                className="text-[#1E90FF] font-semibold text-[#E6E6E6]"
+                href="/(auth)/login"
+              >
+                sign up.
+              </Link>
+            </Text>
           </View>
 
           {/* Email/Password Form */}
-          <View style={styles.row}>
-            <View style={[styles.inputContainer, styles.halfWidth]}>
-              <Text style={styles.label}>First Name</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="First name"
-                value={firstName}
-                onChangeText={setFirstName}
-                autoComplete="given-name"
-              />
+          <View className="my-4 gap-6">
+            <View className="flex flex-row justify-between">
+              <View className=" shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide w-[49%] rounded-lg">
+                <TextInput
+                  className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm"
+                  placeholder="First name"
+                  value={firstName}
+                  onChangeText={setFirstName}
+                  autoComplete="given-name"
+                />
+              </View>
+              <View className="shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide w-[49%] rounded-lg">
+                <TextInput
+                  className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm"
+                  placeholder="Last name"
+                  value={lastName}
+                  onChangeText={setLastName}
+                  autoComplete="family-name"
+                />
+              </View>
             </View>
-            <View style={[styles.inputContainer, styles.halfWidth]}>
-              <Text style={styles.label}>Last Name</Text>
-              <TextInput
-                style={styles.input}
-                placeholder="Last name"
-                value={lastName}
-                onChangeText={setLastName}
-                autoComplete="family-name"
-              />
+
+            <View className="flex flex-col items-center justify-center gap-6">
+              <View className="w-full rounded-lg shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide">
+                <TextInput
+                  className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChangeText={setEmail}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoComplete="email"
+                />
+              </View>
+
+              <View className="w-full rounded-lg shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide">
+                <TextInput
+                  className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm"
+                  placeholder="Create a password (min. 8 chars)"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry
+                  autoComplete="new-password"
+                />
+              </View>
             </View>
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Enter your email"
-              value={email}
-              onChangeText={setEmail}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoComplete="email"
-            />
-          </View>
-
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Password</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Create a password (min. 8 chars)"
-              value={password}
-              onChangeText={setPassword}
-              secureTextEntry
-              autoComplete="new-password"
-            />
           </View>
 
           <TouchableOpacity
-            style={[styles.button, loading && styles.buttonDisabled]}
+            // style={[styles.button, loading && styles.buttonDisabled]}
+            className="w-full py-4 px-5 bg-transparent rounded-lg shadow-md font-normal text-base border border-[rgba(255,255,255,0.15)] tracking-wide items-center my-6"
             onPress={handleSignUp}
             disabled={loading}
           >
-            <Text style={styles.buttonText}>
+            <Text className="text-[rgba(255,255,255,0.75)] font-normal text-base">
               {loading ? "Creating Account..." : "Sign Up"}
             </Text>
           </TouchableOpacity>
 
-          <View style={styles.linkContainer}>
+          {/* <View style={styles.linkContainer}>
             <Text style={styles.linkText}>
               Already have an account?{" "}
               <Link href="/login" style={styles.linkHighlight}>
                 Sign In
               </Link>
             </Text>
-          </View>
+          </View> */}
+          <SSOButtons handleSSOAuth={handleSSOAuth} />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

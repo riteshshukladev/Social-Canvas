@@ -1,6 +1,5 @@
 import { SSOButtons } from "@/components/SSOButtons";
 import { useWarmUpBrowser } from "@/hooks/useWarmUpBrowser";
-import { styles } from "@/styles/authstyles";
 import { useAuth, useOAuth, useSignIn } from "@clerk/clerk-expo";
 import { Link, useRouter } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
@@ -15,6 +14,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+// import Logo from "../../assets/images/main-icon/main-logo.svg";
 
 export default function LoginScreen() {
   useWarmUpBrowser();
@@ -97,32 +97,37 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      className="container"
+      className="flex-1 bg-gray-100"
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <ScrollView
-        className="scrollContainer"
+        className="flex-1"
         contentContainerStyle={{
           justifyContent: "center",
           flexGrow: 1,
           padding: 8,
         }}
       >
-        <View className="auth-container">
-          <View className="auth-heading-container">
+        <View className="px-10 py-16 border border-gray-300 rounded-3xl bg-black shadow-md">
+          <View className="flex flex-col items-center justify-center mb-6 tracking-wide">
             <Image src="" className="" />
-            <Text className="auth-heading">Welcome Back</Text>
-            <Text className="auth-subheading">
+            <Text className="text-3xl font-bold mb-2 text-center pb-0 text-white tracking-wide">
+              Welcome Back
+            </Text>
+            <Text className="text-sm font-normal text-center text-[#8A8888] tracking-wide">
               first time here?{" "}
-              <Link className="auth-sublink" href="/(auth)/signup">
+              <Link
+                className="text-[#1E90FF] font-semibold text-[#E6E6E6]"
+                href="/(auth)/signup"
+              >
                 sign up.
               </Link>
             </Text>
           </View>
-          <View className="formContainer">
-            <View className="inputContainer">
+          <View className="flex flex-col items-center justify-center gap-8 my-6">
+            <View className="w-full rounded-lg shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide">
               <TextInput
-                className="input"
+                className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm rounded-lg"
                 placeholder="Enter your email"
                 value={email}
                 onChangeText={setEmail}
@@ -132,9 +137,9 @@ export default function LoginScreen() {
               />
             </View>
 
-            <View className="inputContainer">
+            <View className="w-full rounded-lg shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide">
               <TextInput
-                className="input"
+                className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm"
                 placeholder="Enter your password"
                 value={password}
                 onChangeText={setPassword}
@@ -147,23 +152,14 @@ export default function LoginScreen() {
           <TouchableOpacity
             onPress={handleSignIn}
             disabled={loading}
-            className="button"
+            className="w-full py-4 px-5 bg-transparent rounded-lg shadow-md font-normal text-base border border-[rgba(255,255,255,0.15)] tracking-wide items-center my-6"
           >
-            <Text className="buttonText">
+            <Text className="text-[rgba(255,255,255,0.75)] font-normal text-base">
               {loading ? "Signing In..." : "Sign In"}
             </Text>
           </TouchableOpacity>
 
           <SSOButtons handleSSOAuth={handleSSOAuth} />
-
-          <View style={styles.linkContainer}>
-            <Text style={styles.linkText}>
-              Don't have an account?{" "}
-              <Link href="/signup" style={styles.linkHighlight}>
-                Sign Up
-              </Link>
-            </Text>
-          </View>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

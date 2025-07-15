@@ -9,25 +9,18 @@ interface SSOButtonsProps {
 export const SSOButtons: React.FC<SSOButtonsProps> = ({ handleSSOAuth }) => {
   return (
     <>
-      <View style={styles.separatorContainer}>
-        <View style={styles.separatorLine} />
-        <Text style={styles.separatorText}>OR</Text>
-        <View style={styles.separatorLine} />
+      <View className="flex flex-row items-center justify-center my-8">
+        <View className="flex-1 h-[.8] bg-gray-300 opacity-60" />
+        <Text className="mx-3 text-sm text-white opacity-50">OR</Text>
+        <View className="flex-1 h-[.8] bg-gray-300 opacity-60" />
       </View>
 
-      <View style={styles.ssoContainer}>
+      <View className="w-full gap-4">
         <TouchableOpacity
           style={styles.ssoButton}
           onPress={() => handleSSOAuth("oauth_google")}
         >
-          <Text style={styles.ssoButtonText}>Continue with Google</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={styles.ssoButton}
-          onPress={() => handleSSOAuth("oauth_github")}
-        >
-          <Text style={styles.ssoButtonText}>Continue with GitHub</Text>
+          <Text style={styles.ssoButtonText}>Single Sign On (SSO)</Text>
         </TouchableOpacity>
       </View>
     </>

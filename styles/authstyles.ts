@@ -194,20 +194,20 @@ ssoButton: {
   flexDirection: 'row',
   alignItems: 'center',
   justifyContent: 'center',
-  paddingVertical: 14,
+  paddingVertical: 16,
   paddingHorizontal: 20,
   borderRadius: 8,
   borderWidth: 1,
-  borderColor: '#E0E0E0',
-  backgroundColor: '#FFFFFF', // White background
+  borderColor: 'rgba(255, 255, 255, 0.11)',
+  backgroundColor: 'transparent', // White background
   width: '100%',
 },
 // SSO button text style
 ssoButtonText: {
-  marginLeft: 10, // Space between icon and text
   fontSize: 16,
-  fontWeight: '600',
-  color: '#333',
+  fontWeight: '400',
+  letterSpacing: 0.4,
+  color: 'white',
   },
 loadingOverlay: {
     position: 'absolute',
