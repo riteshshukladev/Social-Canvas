@@ -1,3 +1,5 @@
+// app/_layout.jsx
+import { SupabaseProvider } from "@/components/SupabaseProvider";
 import { tokenCache } from "@/utils/tokenCache";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
 import {
@@ -26,7 +28,6 @@ function ConditionalStack() {
 
   const { isSignedIn, isLoaded } = useAuth();
 
-  // Now handle the loading states
   if (!isLoadedFont || !isLoaded) {
     return (
       <View
@@ -43,39 +44,41 @@ function ConditionalStack() {
   }
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        animation: "none",
-        animationDuration: 0,
-      }}
-    >
-      {isSignedIn ? (
-        <Stack.Screen
-          name="(screen)"
-          options={{
-            headerShown: false,
-            animation: "none",
-          }}
-        />
-      ) : (
-        <Stack.Screen
-          name="(auth)"
-          options={{
-            headerShown: false,
-            animation: "none",
-          }}
-        />
-      )}
-      <Stack.Screen
-        name="+not-found"
-        options={{
+    <SupabaseProvider>
+      <Stack
+        screenOptions={{
           headerShown: false,
-          presentation: "modal",
           animation: "none",
+          animationDuration: 0,
         }}
-      />
-    </Stack>
+      >
+        {isSignedIn ? (
+          <Stack.Screen
+            name="(screen)"
+            options={{
+              headerShown: false,
+              animation: "none",
+            }}
+          />
+        ) : (
+          <Stack.Screen
+            name="(auth)"
+            options={{
+              headerShown: false,
+              animation: "none",
+            }}
+          />
+        )}
+        <Stack.Screen
+          name="+not-found"
+          options={{
+            headerShown: false,
+            presentation: "modal",
+            animation: "none",
+          }}
+        />
+      </Stack>
+    </SupabaseProvider>
   );
 }
 
@@ -85,7 +88,7 @@ export default function RootLayout() {
   return (
     <ClerkProvider
       tokenCache={tokenCache}
-      publishableKey={process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY}
+      publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY}
     >
       <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
         <ConditionalStack />
