@@ -18,6 +18,11 @@ module.exports = {
         sftdemibold: ["SFT-demibold"],
         sftblack: ["SFT-black"],
       },
+      colors: {
+        primary: "rgba(246, 245, 240, 1)", // Light cream/off-white
+        secondary: "rgba(230, 230, 230, 1)", // Light gray
+        "text-primary": "rgba(0, 0, 0, 1)", // Pure black
+      },
     },
   },
   plugins: [],

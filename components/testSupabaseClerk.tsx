@@ -1,8 +1,7 @@
-import { useAuth, useUser } from "@clerk/clerk-expo"; // Add useAuth here
-import React, { useEffect, useState } from "react";
+// components/TestSupabaseClerk.tsx
+import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   Button,
   ScrollView,
   StyleSheet,
@@ -10,194 +9,35 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { useSupabaseContext } from "./SupabaseProvider";
+import { useCatalogOperations } from "../hooks/useCatalogOperations";
 
-export const TestSupabaseClerk = () => {
-  const { user } = useUser();
-  const { getToken } = useAuth(); // Now getToken is available from useAuth
-  const { supabase, isReady } = useSupabaseContext();
+export const TestSupabaseClerk: React.FC = () => {
+  const [newCatalogName, setNewCatalogName] = useState<string>("");
+  const [newCatalogYear, setNewCatalogYear] = useState<string>("");
 
-  const [connectionStatus, setConnectionStatus] = useState("Testing...");
-  const [posts, setPosts] = useState([]);
-  const [newPostTitle, setNewPostTitle] = useState("");
-  const [newPostContent, setNewPostContent] = useState("");
-  const [loading, setLoading] = useState(false);
+  const {
+    user,
+    isReady,
+    connectionStatus,
+    catalogs,
+    loading,
+    testConnection,
+    fetchCatalogs,
+    createCatalog,
+    deleteCatalog,
+    testJWT,
+  } = useCatalogOperations();
 
-  // Test 1: Check Clerk user and Supabase connection
-  useEffect(() => {
-    if (user && isReady) {
-      testConnection();
-    }
-  }, [user, isReady]);
-
-  const testConnection = async () => {
-    try {
-      // Test 1: Basic Supabase connection
-      const { data, error } = await supabase
-        .from("users")
-        .select("count")
-        .limit(1);
-
-      if (error) {
-        setConnectionStatus(`❌ Connection Error: ${error.message}`);
-        return;
-      }
-
-      setConnectionStatus("✅ Supabase Connected!");
-
-      // Test 2: User sync
-      await testUserSync();
-
-      // Test 3: Fetch posts
-      await fetchPosts();
-    } catch (error) {
-      setConnectionStatus(`❌ Error: ${error.message}`);
+  const handleCreateCatalog = async (): Promise<void> => {
+    const result = await createCatalog(newCatalogName, newCatalogYear);
+    if (result.success) {
+      setNewCatalogName("");
+      setNewCatalogYear("");
     }
   };
 
-  const testUserSync = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("users")
-        .upsert({
-          id: user.id,
-          email: user.primaryEmailAddress?.emailAddress,
-          first_name: user.firstName,
-          last_name: user.lastName,
-          avatar_url: user.imageUrl,
-          updated_at: new Date().toISOString(),
-        })
-        .select();
-
-      if (error) {
-        Alert.alert("User Sync Error", error.message);
-      } else {
-        Alert.alert("✅ User Sync Success", "User data synced to Supabase!");
-      }
-    } catch (error) {
-      Alert.alert("User Sync Error", error.message);
-    }
-  };
-
-  const fetchPosts = async () => {
-    setLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from("posts")
-        .select(
-          `
-          *,
-          users!posts_user_id_fkey (
-            first_name,
-            last_name,
-            email
-          )
-        `
-        )
-        .order("created_at", { ascending: false });
-
-      if (error) throw error;
-      setPosts(data || []);
-    } catch (error) {
-      Alert.alert("Fetch Error", error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const testJWT = async () => {
-    try {
-      const token = await getToken({ template: "supabase" });
-      console.log("JWT Token exists:", !!token);
-
-      if (token) {
-        // Decode the token to see what's inside (for debugging)
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        console.log("JWT Payload:", payload);
-        console.log("User ID from JWT:", payload.sub);
-        console.log("Current Clerk User ID:", user.id);
-      } else {
-        console.log("No token retrieved.");
-      }
-    } catch (error) {
-      console.error("JWT Error:", error);
-    }
-  };
-
-  const createPost = async () => {
-    if (!newPostTitle.trim()) {
-      Alert.alert("Error", "Please enter a title");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // Retry logic for JWT expiration
-      let retries = 0;
-      const maxRetries = 2;
-
-      while (retries <= maxRetries) {
-        try {
-          const { data, error } = await supabase.from("posts").insert([
-            {
-              title: newPostTitle,
-              content: newPostContent,
-              user_id: user.id,
-            },
-          ]).select(`
-              *,
-              users!posts_user_id_fkey (
-                first_name,
-                last_name,
-                email
-              )
-            `);
-
-          if (error) {
-            if (error.message.includes("JWT") && retries < maxRetries) {
-              console.log(
-                `JWT expired, retrying... (${retries + 1}/${maxRetries})`
-              );
-              retries++;
-              await new Promise((resolve) => setTimeout(resolve, 1000));
-              continue;
-            }
-            throw error;
-          }
-
-          setPosts([data[0], ...posts]);
-          setNewPostTitle("");
-          setNewPostContent("");
-          Alert.alert("✅ Success", "Post created successfully!");
-          break;
-        } catch (error) {
-          if (retries === maxRetries) {
-            throw error;
-          }
-          retries++;
-        }
-      }
-    } catch (error) {
-      Alert.alert("Create Error", error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const deletePost = async (postId) => {
-    setLoading(true);
-    try {
-      const { error } = await supabase.from("posts").delete().eq("id", postId);
-
-      if (error) throw error;
-
-      setPosts(posts.filter((post) => post.id !== postId));
-      Alert.alert("✅ Success", "Post deleted successfully!");
-    } catch (error) {
-      Alert.alert("Delete Error", error.message);
-    } finally {
-      setLoading(false);
-    }
+  const handleDeleteCatalog = async (catalogId: string): Promise<void> => {
+    await deleteCatalog(catalogId);
   };
 
   if (!user) {
@@ -220,7 +60,7 @@ export const TestSupabaseClerk = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>🧪 Clerk + Supabase Test</Text>
+      <Text style={styles.title}>📚 Clerk + Supabase Catalog Test</Text>
 
       {/* User Info */}
       <View style={styles.section}>
@@ -239,53 +79,58 @@ export const TestSupabaseClerk = () => {
         <Button title="Test Connection" onPress={testConnection} />
       </View>
 
-      {/* Create Post */}
+      {/* Create Catalog */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>✍️ Create Post</Text>
+        <Text style={styles.sectionTitle}>📝 Create Catalog</Text>
         <TextInput
           style={styles.input}
-          placeholder="Post title"
-          value={newPostTitle}
-          onChangeText={setNewPostTitle}
+          placeholder="Catalog name"
+          value={newCatalogName}
+          onChangeText={setNewCatalogName}
         />
         <TextInput
-          style={[styles.input, styles.textArea]}
-          placeholder="Post content"
-          value={newPostContent}
-          onChangeText={setNewPostContent}
-          multiline
+          style={styles.input}
+          placeholder="Creation year (e.g., 2024)"
+          value={newCatalogYear}
+          onChangeText={setNewCatalogYear}
+          keyboardType="numeric"
         />
         <Button
-          title={loading ? "Creating..." : "Create Post"}
-          onPress={createPost}
+          title={loading ? "Creating..." : "Create Catalog"}
+          onPress={handleCreateCatalog}
           disabled={loading}
         />
       </View>
 
-      {/* Posts List */}
+      {/* Catalogs List */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>📝 Posts ({posts.length})</Text>
-        <Button title="Refresh Posts" onPress={fetchPosts} />
+        <Text style={styles.sectionTitle}>📚 Catalogs ({catalogs.length})</Text>
+        <Button title="Refresh Catalogs" onPress={fetchCatalogs} />
 
         {loading && <ActivityIndicator style={{ marginTop: 10 }} />}
 
-        {posts.map((post) => (
-          <View key={post.id} style={styles.postItem}>
-            <Text style={styles.postTitle}>{post.title}</Text>
-            <Text style={styles.postContent}>{post.content}</Text>
-            <Text style={styles.postMeta}>
-              By: {post.users?.first_name} {post.users?.last_name}
+        {catalogs.map((catalog) => (
+          <View key={catalog.id} style={styles.catalogItem}>
+            <Text style={styles.catalogName}>{catalog.name}</Text>
+            <Text style={styles.catalogYear}>
+              Year: {catalog.creation_date}
             </Text>
-            <Text style={styles.postMeta}>
-              Created: {new Date(post.created_at).toLocaleDateString()}
+            <Text style={styles.catalogMeta}>
+              By: {catalog.users?.first_name} {catalog.users?.last_name}
+            </Text>
+            <Text style={styles.catalogMeta}>
+              Created: {new Date(catalog.creation_time).toLocaleDateString()}
+            </Text>
+            <Text style={styles.catalogMeta}>
+              Record Added: {new Date(catalog.created_at).toLocaleDateString()}
             </Text>
 
-            {/* Only show delete button for own posts */}
-            {post.user_id === user.id && (
+            {/* Only show delete button for own catalogs */}
+            {catalog.user_id === user.id && (
               <Button
                 title="Delete"
                 color="red"
-                onPress={() => deletePost(post.id)}
+                onPress={() => handleDeleteCatalog(catalog.id)}
               />
             )}
           </View>
@@ -327,11 +172,7 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     backgroundColor: "#fff",
   },
-  textArea: {
-    height: 80,
-    textAlignVertical: "top",
-  },
-  postItem: {
+  catalogItem: {
     marginTop: 15,
     padding: 15,
     backgroundColor: "#fff",
@@ -339,16 +180,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#eee",
   },
-  postTitle: {
+  catalogName: {
     fontSize: 16,
     fontWeight: "bold",
     marginBottom: 5,
   },
-  postContent: {
+  catalogYear: {
     fontSize: 14,
-    marginBottom: 10,
+    fontWeight: "600",
+    color: "#2563eb",
+    marginBottom: 5,
   },
-  postMeta: {
+  catalogMeta: {
     fontSize: 12,
     color: "#666",
     marginBottom: 5,
