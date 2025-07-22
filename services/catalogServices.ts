@@ -44,14 +44,11 @@ export const catalogService: CatalogService = {
         .select();
 
       if (error) {
-        Alert.alert("User Sync Error", error.message);
         return { success: false, error };
       } else {
-        Alert.alert("✅ User Sync Success", "User data synced to Supabase!");
         return { success: true, data };
       }
-    } catch (error: any) {
-      Alert.alert("User Sync Error", error.message);
+    } catch (error: any) { 
       return { success: false, error };
     }
   },

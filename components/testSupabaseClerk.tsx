@@ -2,18 +2,30 @@
 import React, { useState } from "react";
 import {
   ActivityIndicator,
-  Button,
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
+  TouchableOpacity,
   View,
 } from "react-native";
+
 import { useCatalogOperations } from "../hooks/useCatalogOperations";
+import { CreateCatalogOverlay } from "./CreateCatalogOverlay";
+import { DeleteCatalogModal } from "./DeleteCatalogModal";
 
 export const TestSupabaseClerk: React.FC = () => {
   const [newCatalogName, setNewCatalogName] = useState<string>("");
   const [newCatalogYear, setNewCatalogYear] = useState<string>("");
+  const [showCreateOverlay, setShowCreateOverlay] = useState<boolean>(false);
+
+  // Delete modal state
+  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
+  const [catalogToDelete, setCatalogToDelete] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   const {
     user,
@@ -33,11 +45,32 @@ export const TestSupabaseClerk: React.FC = () => {
     if (result.success) {
       setNewCatalogName("");
       setNewCatalogYear("");
+      setShowCreateOverlay(false);
     }
   };
 
-  const handleDeleteCatalog = async (catalogId: string): Promise<void> => {
-    await deleteCatalog(catalogId);
+  const handleLongPressCatalog = (catalog: { id: string; name: string }) => {
+    // Only allow deletion of user's own catalogs
+    const userCatalog = catalogs.find(
+      (c) => c.id === catalog.id && c.user_id === user?.id
+    );
+    if (userCatalog) {
+      setCatalogToDelete(catalog);
+      setShowDeleteModal(true);
+    }
+  };
+
+  const handleConfirmDelete = async (): Promise<void> => {
+    if (catalogToDelete) {
+      const result = await deleteCatalog(catalogToDelete.id);
+      setShowDeleteModal(false);
+      setCatalogToDelete(null);
+    }
+  };
+
+  const handleCloseDeleteModal = () => {
+    setShowDeleteModal(false);
+    setCatalogToDelete(null);
   };
 
   if (!user) {
@@ -59,85 +92,72 @@ export const TestSupabaseClerk: React.FC = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>📚 Clerk + Supabase Catalog Test</Text>
-
-      {/* User Info */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>👤 Clerk User Info</Text>
-        <Text>ID: {user.id}</Text>
-        <Text>Email: {user.primaryEmailAddress?.emailAddress}</Text>
-        <Text>
-          Name: {user.firstName} {user.lastName}
-        </Text>
-      </View>
-
-      {/* Connection Status */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>🔗 Connection Status</Text>
-        <Text>{connectionStatus}</Text>
-        <Button title="Test Connection" onPress={testConnection} />
-      </View>
-
-      {/* Create Catalog */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>📝 Create Catalog</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Catalog name"
-          value={newCatalogName}
-          onChangeText={setNewCatalogName}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Creation year (e.g., 2024)"
-          value={newCatalogYear}
-          onChangeText={setNewCatalogYear}
-          keyboardType="numeric"
-        />
-        <Button
-          title={loading ? "Creating..." : "Create Catalog"}
-          onPress={handleCreateCatalog}
-          disabled={loading}
-        />
-      </View>
-
-      {/* Catalogs List */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>📚 Catalogs ({catalogs.length})</Text>
-        <Button title="Refresh Catalogs" onPress={fetchCatalogs} />
-
-        {loading && <ActivityIndicator style={{ marginTop: 10 }} />}
-
-        {catalogs.map((catalog) => (
-          <View key={catalog.id} style={styles.catalogItem}>
-            <Text style={styles.catalogName}>{catalog.name}</Text>
-            <Text style={styles.catalogYear}>
-              Year: {catalog.creation_date}
+    <>
+      <KeyboardAvoidingView
+        className="flex-1"
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
+        <ScrollView className="bg-primary px-3">
+          {/* User Info */}
+          <View className="flex flex-row w-full justify-between py-2">
+            <Text className="text-base font-sftmedium tracking-wide">
+              {user.firstName} {user.lastName}
             </Text>
-            <Text style={styles.catalogMeta}>
-              By: {catalog.users?.first_name} {catalog.users?.last_name}
-            </Text>
-            <Text style={styles.catalogMeta}>
-              Created: {new Date(catalog.creation_time).toLocaleDateString()}
-            </Text>
-            <Text style={styles.catalogMeta}>
-              Record Added: {new Date(catalog.created_at).toLocaleDateString()}
-            </Text>
-
-            {/* Only show delete button for own catalogs */}
-            {catalog.user_id === user.id && (
-              <Button
-                title="Delete"
-                color="red"
-                onPress={() => handleDeleteCatalog(catalog.id)}
-              />
-            )}
+            <TouchableOpacity onPress={() => setShowCreateOverlay(true)}>
+              <Text className="text-base font-sftmedium tracking-wide pb-0.3 border-b border-black">
+                Create Catalog
+              </Text>
+            </TouchableOpacity>
           </View>
-        ))}
-        <Button title="Test JWT" onPress={testJWT} />
-      </View>
-    </ScrollView>
+
+          {/* Catalogs List */}
+          <View className="flex flex-col w-full gap-49- pt-8">
+            {catalogs.map((catalog) => (
+              <TouchableOpacity
+                key={catalog.id}
+                onLongPress={() =>
+                  handleLongPressCatalog({
+                    id: catalog.id,
+                    name: catalog.name,
+                  })
+                }
+                delayLongPress={500} // 500ms long press duration
+                className="flex flex-row w-full justify-between pb-2 pt-2 border-b border-black"
+                activeOpacity={0.7}
+              >
+                <Text className="text-lg font-sftmedium tracking">
+                  {catalog.name}
+                </Text>
+                <Text className="text-lg font-sftmedium tracking">
+                  {catalog.creation_date}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+
+      {/* Create Catalog Overlay */}
+      <CreateCatalogOverlay
+        visible={showCreateOverlay}
+        onClose={() => setShowCreateOverlay(false)}
+        catalogName={newCatalogName}
+        setCatalogName={setNewCatalogName}
+        catalogYear={newCatalogYear}
+        setCatalogYear={setNewCatalogYear}
+        onSubmit={handleCreateCatalog}
+        loading={loading}
+      />
+
+      {/* Delete Catalog Modal */}
+      <DeleteCatalogModal
+        visible={showDeleteModal}
+        onClose={handleCloseDeleteModal}
+        onConfirm={handleConfirmDelete}
+        catalogName={catalogToDelete?.name || ""}
+        loading={loading}
+      />
+    </>
   );
 };
 

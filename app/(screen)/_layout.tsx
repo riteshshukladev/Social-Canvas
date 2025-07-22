@@ -10,12 +10,12 @@ export default function ScreenLayout() {
           <Header
             {...options}
             headerStyle={{
-              height: 50, // ✅ This works!
-              backgroundColor: "#6366f1",
+              height: 40, // ✅ This works!
+              backgroundColor: "rgba(246, 245, 240, 1)",
             }}
           />
         ),
-        headerTintColor: "#ffffff",
+        // headerTintColor: "#ffffff",
       }}
     >
       <Stack.Screen
