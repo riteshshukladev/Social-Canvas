@@ -1,4 +1,5 @@
 // components/TestSupabaseClerk.tsx
+import { useAuth } from "@clerk/clerk-expo";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
@@ -10,14 +11,16 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
 import { useCatalogOperations } from "../hooks/useCatalogOperations";
 import { CreateCatalogOverlay } from "./CreateCatalogOverlay";
 import { DeleteCatalogModal } from "./DeleteCatalogModal";
+import EmptyCatalogs from "./EmptyCatalogs";
 
 export const TestSupabaseClerk: React.FC = () => {
   const [newCatalogName, setNewCatalogName] = useState<string>("");
-  const [newCatalogYear, setNewCatalogYear] = useState<string>("");
+  const [newCatalogYear, setNewCatalogYear] = useState(
+    new Date().getFullYear().toString()
+  );
   const [showCreateOverlay, setShowCreateOverlay] = useState<boolean>(false);
 
   // Delete modal state
@@ -38,6 +41,7 @@ export const TestSupabaseClerk: React.FC = () => {
     createCatalog,
     deleteCatalog,
     testJWT,
+    fetchCatalogsLoadingState,
   } = useCatalogOperations();
 
   const handleCreateCatalog = async (): Promise<void> => {
@@ -68,11 +72,20 @@ export const TestSupabaseClerk: React.FC = () => {
     }
   };
 
+  const { signOut } = useAuth();
+
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     setCatalogToDelete(null);
   };
-
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      // Optionally, redirect to login or home scree
+    } catch (error) {
+      console.error("Sign out failed:", error);
+    }
+  };
   if (!user) {
     return (
       <View style={styles.container}>
@@ -108,31 +121,45 @@ export const TestSupabaseClerk: React.FC = () => {
                 Create Catalog
               </Text>
             </TouchableOpacity>
+            <TouchableOpacity onPress={handleSignOut}>
+              <Text className="text-base font-sftmedium tracking-wide pb-0.3 border-b border-black">
+                Logout
+              </Text>
+            </TouchableOpacity>
           </View>
 
           {/* Catalogs List */}
           <View className="flex flex-col w-full gap-49- pt-8">
-            {catalogs.map((catalog) => (
-              <TouchableOpacity
-                key={catalog.id}
-                onLongPress={() =>
-                  handleLongPressCatalog({
-                    id: catalog.id,
-                    name: catalog.name,
-                  })
-                }
-                delayLongPress={500} // 500ms long press duration
-                className="flex flex-row w-full justify-between pb-2 pt-2 border-b border-black"
-                activeOpacity={0.7}
-              >
-                <Text className="text-lg font-sftmedium tracking">
-                  {catalog.name}
-                </Text>
-                <Text className="text-lg font-sftmedium tracking">
-                  {catalog.creation_date}
-                </Text>
-              </TouchableOpacity>
-            ))}
+            {fetchCatalogsLoadingState ? (
+              <ActivityIndicator size="large" />
+            ) : catalogs.length === 0 ? (
+              <EmptyCatalogs
+                name={user.firstName ?? ""}
+                onCreateCatalog={() => setShowCreateOverlay(true)}
+              />
+            ) : (
+              catalogs.map((catalog) => (
+                <TouchableOpacity
+                  key={catalog.id}
+                  onLongPress={() =>
+                    handleLongPressCatalog({
+                      id: catalog.id,
+                      name: catalog.name,
+                    })
+                  }
+                  delayLongPress={500} // 500ms long press duration
+                  className="flex flex-row w-full justify-between pb-2 pt-2 border-b border-black"
+                  activeOpacity={0.7}
+                >
+                  <Text className="text-lg font-sftmedium tracking">
+                    {catalog.name}
+                  </Text>
+                  <Text className="text-lg font-sftmedium tracking">
+                    {catalog.creation_date}
+                  </Text>
+                </TouchableOpacity>
+              ))
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -143,8 +170,6 @@ export const TestSupabaseClerk: React.FC = () => {
         onClose={() => setShowCreateOverlay(false)}
         catalogName={newCatalogName}
         setCatalogName={setNewCatalogName}
-        catalogYear={newCatalogYear}
-        setCatalogYear={setNewCatalogYear}
         onSubmit={handleCreateCatalog}
         loading={loading}
       />

@@ -13,6 +13,7 @@ export const useCatalogOperations = (): CatalogOperationsHook => {
   const [connectionStatus, setConnectionStatus] = useState<string>("Testing...");
   const [catalogs, setCatalogs] = useState<Catalog[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [fetchCatalogsLoadingState, setFetchCatalogsLoadingState] = useState<boolean>(false);
 
   // Test connection and setup on mount
   useEffect(() => {
@@ -40,14 +41,18 @@ export const useCatalogOperations = (): CatalogOperationsHook => {
   };
 
   const fetchCatalogs = async (): Promise<void> => {
-    setLoading(true);
+    setFetchCatalogsLoadingState(true);
     try {
-      const result = await catalogService.fetchCatalogs(supabase);
+      if (!user) {
+        setFetchCatalogsLoadingState(false);
+        return;
+      }
+      const result = await catalogService.fetchCatalogs(supabase, user.id);
       if (result.success && result.data) {
         setCatalogs(result.data);
       }
     } finally {
-      setLoading(false);
+      setFetchCatalogsLoadingState(false);
     }
   };
 
@@ -104,5 +109,6 @@ export const useCatalogOperations = (): CatalogOperationsHook => {
     createCatalog,
     deleteCatalog,
     testJWT,
+    fetchCatalogsLoadingState,
   };
 };

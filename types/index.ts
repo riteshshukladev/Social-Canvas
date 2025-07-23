@@ -76,7 +76,7 @@ export interface CatalogOperationsHook {
 export interface CatalogService {
   testConnection: (supabase: SupabaseClient) => Promise<ServiceResponse>;
   syncUser: (supabase: SupabaseClient, user: ClerkUser) => Promise<ServiceResponse>;
-  fetchCatalogs: (supabase: SupabaseClient) => Promise<ServiceResponse<Catalog[]>>;
+  fetchCatalogs: (supabase: SupabaseClient, userId: string) => Promise<ServiceResponse<Catalog[]>>;
   createCatalog: (
     supabase: SupabaseClient,
     user: ClerkUser,

@@ -54,29 +54,37 @@ export const catalogService: CatalogService = {
   },
 
   // Fetch all catalogs
-  async fetchCatalogs(supabase: SupabaseClient): Promise<ServiceResponse<Catalog[]>> {
-    try {
-      const { data, error } = await supabase
-        .from("catalog")
-        .select(
-          `
-          *,
-          users!catalog_user_id_fkey (
-            first_name,
-            last_name,
-            email
-          )
-        `
-        )
-        .order("created_at", { ascending: false });
+// services/catalogService.ts
 
-      if (error) throw error;
-      return { success: true, data: data || [] };
-    } catch (error: any) {
-      Alert.alert("Fetch Error", error.message);
-      return { success: false, error };
-    }
-  },
+// Update the function signature to accept user
+async fetchCatalogs(
+  supabase: SupabaseClient, 
+  userId: string  
+): Promise<ServiceResponse<Catalog[]>> {
+  try {
+    const { data, error } = await supabase
+      .from("catalog")
+      .select(
+        `
+        *,
+        users!catalog_user_id_fkey (
+          first_name,
+          last_name,
+          email
+        )
+      `
+      )
+      .eq("user_id", userId) // ← Add this filter!
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    return { success: true, data: data || [] };
+  } catch (error: any) {
+    Alert.alert("Fetch Error", error.message);
+    return { success: false, error };
+  }
+},
+
 
   // Create a new catalog with retry logic
   async createCatalog(
