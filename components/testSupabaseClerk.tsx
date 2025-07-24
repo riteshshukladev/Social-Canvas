@@ -1,6 +1,7 @@
 // components/TestSupabaseClerk.tsx
 import { useAuth } from "@clerk/clerk-expo";
-import React, { useState } from "react";
+import { useRouter } from "expo-router";
+import React, { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -15,13 +16,17 @@ import { useCatalogOperations } from "../hooks/useCatalogOperations";
 import { CreateCatalogOverlay } from "./CreateCatalogOverlay";
 import { DeleteCatalogModal } from "./DeleteCatalogModal";
 import EmptyCatalogs from "./EmptyCatalogs";
+import LogoutModal from "./LogoutModal";
 
 export const TestSupabaseClerk: React.FC = () => {
+  const router = useRouter();
   const [newCatalogName, setNewCatalogName] = useState<string>("");
   const [newCatalogYear, setNewCatalogYear] = useState(
     new Date().getFullYear().toString()
   );
   const [showCreateOverlay, setShowCreateOverlay] = useState<boolean>(false);
+  const [showEmptyCatalogsModal, setShowEmptyCatalogsModal] =
+    useState<boolean>(false);
 
   // Delete modal state
   const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
@@ -29,6 +34,8 @@ export const TestSupabaseClerk: React.FC = () => {
     id: string;
     name: string;
   } | null>(null);
+
+  const [logOutModalVisible, setLogOutModalVisible] = useState<boolean>(false);
 
   const {
     user,
@@ -44,17 +51,35 @@ export const TestSupabaseClerk: React.FC = () => {
     fetchCatalogsLoadingState,
   } = useCatalogOperations();
 
+  // Show empty catalogs modal when there are no catalogs and not loading
+  useEffect(() => {
+    if (!fetchCatalogsLoadingState && catalogs.length === 0 && isReady) {
+      setShowEmptyCatalogsModal(true);
+    } else {
+      setShowEmptyCatalogsModal(false);
+    }
+  }, [catalogs.length, fetchCatalogsLoadingState, isReady]);
+
   const handleCreateCatalog = async (): Promise<void> => {
     const result = await createCatalog(newCatalogName, newCatalogYear);
     if (result.success) {
       setNewCatalogName("");
       setNewCatalogYear("");
       setShowCreateOverlay(false);
+      setShowEmptyCatalogsModal(false); // Hide empty modal after creating catalog
     }
   };
 
+  const handleCreateCatalogFromEmpty = () => {
+    setShowEmptyCatalogsModal(false);
+    setShowCreateOverlay(true);
+  };
+
+  const handleCloseEmptyCatalogsModal = () => {
+    setShowEmptyCatalogsModal(false);
+  };
+
   const handleLongPressCatalog = (catalog: { id: string; name: string }) => {
-    // Only allow deletion of user's own catalogs
     const userCatalog = catalogs.find(
       (c) => c.id === catalog.id && c.user_id === user?.id
     );
@@ -72,37 +97,37 @@ export const TestSupabaseClerk: React.FC = () => {
     }
   };
 
+  const logOutModalState = () => {
+    setLogOutModalVisible(!logOutModalVisible);
+  };
+
   const { signOut } = useAuth();
 
   const handleCloseDeleteModal = () => {
     setShowDeleteModal(false);
     setCatalogToDelete(null);
   };
+
   const handleSignOut = async () => {
     try {
       await signOut();
-      // Optionally, redirect to login or home scree
+      router.dismissAll();
+      router.push("/(auth)/login");
     } catch (error) {
       console.error("Sign out failed:", error);
     }
   };
-  if (!user) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.title}>❌ No User Found</Text>
-        <Text>Please sign in with Clerk</Text>
-      </View>
-    );
-  }
 
-  if (!isReady) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator size="large" />
-        <Text>Setting up Supabase...</Text>
-      </View>
-    );
-  }
+
+  // Add the loading screen
+  // if (!isReady) {
+  //   return (
+  //     <View style={styles.container}>
+  //       <ActivityIndicator size="large" />
+  //       <Text>Setting up Supabase...</Text>
+  //     </View>
+  //   );
+  // }
 
   return (
     <>
@@ -113,19 +138,17 @@ export const TestSupabaseClerk: React.FC = () => {
         <ScrollView className="bg-primary px-3">
           {/* User Info */}
           <View className="flex flex-row w-full justify-between py-2">
-            <Text className="text-base font-sftmedium tracking-wide">
-              {user.firstName} {user.lastName}
-            </Text>
+            <TouchableOpacity onPress={logOutModalState}>
+              <Text className="text-base font-sftmedium tracking-wide">
+                {user.firstName} {user.lastName}
+              </Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => setShowCreateOverlay(true)}>
               <Text className="text-base font-sftmedium tracking-wide pb-0.3 border-b border-black">
                 Create Catalog
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={handleSignOut}>
-              <Text className="text-base font-sftmedium tracking-wide pb-0.3 border-b border-black">
-                Logout
-              </Text>
-            </TouchableOpacity>
+           
           </View>
 
           {/* Catalogs List */}
@@ -133,10 +156,9 @@ export const TestSupabaseClerk: React.FC = () => {
             {fetchCatalogsLoadingState ? (
               <ActivityIndicator size="large" />
             ) : catalogs.length === 0 ? (
-              <EmptyCatalogs
-                name={user.firstName ?? ""}
-                onCreateCatalog={() => setShowCreateOverlay(true)}
-              />
+              <Text className="text-center text-lg font-sftbold tracking-wide pt-4">
+                No catalogs.
+              </Text>
             ) : (
               catalogs.map((catalog) => (
                 <TouchableOpacity
@@ -147,7 +169,7 @@ export const TestSupabaseClerk: React.FC = () => {
                       name: catalog.name,
                     })
                   }
-                  delayLongPress={500} // 500ms long press duration
+                  delayLongPress={500} 
                   className="flex flex-row w-full justify-between pb-2 pt-2 border-b border-black"
                   activeOpacity={0.7}
                 >
@@ -164,12 +186,21 @@ export const TestSupabaseClerk: React.FC = () => {
         </ScrollView>
       </KeyboardAvoidingView>
 
+      <EmptyCatalogs
+        name={user.firstName ?? ""}
+        visible={showEmptyCatalogsModal}
+        onClose={handleCloseEmptyCatalogsModal}
+        onCreateCatalog={handleCreateCatalogFromEmpty}
+      />
+
       {/* Create Catalog Overlay */}
       <CreateCatalogOverlay
         visible={showCreateOverlay}
         onClose={() => setShowCreateOverlay(false)}
         catalogName={newCatalogName}
         setCatalogName={setNewCatalogName}
+        catalogYear={newCatalogYear}
+        setCatalogYear={setNewCatalogYear}
         onSubmit={handleCreateCatalog}
         loading={loading}
       />
@@ -182,63 +213,13 @@ export const TestSupabaseClerk: React.FC = () => {
         catalogName={catalogToDelete?.name || ""}
         loading={loading}
       />
+      {/* Log Out Modal */}
+      <LogoutModal
+        visible={logOutModalVisible}
+        onClose={logOutModalState}
+        onLogout={handleSignOut}
+      />
     </>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: "#fff",
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  section: {
-    marginBottom: 30,
-    padding: 15,
-    backgroundColor: "#f5f5f5",
-    borderRadius: 10,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    padding: 10,
-    marginBottom: 10,
-    borderRadius: 5,
-    backgroundColor: "#fff",
-  },
-  catalogItem: {
-    marginTop: 15,
-    padding: 15,
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: "#eee",
-  },
-  catalogName: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 5,
-  },
-  catalogYear: {
-    fontSize: 14,
-    fontWeight: "600",
-    color: "#2563eb",
-    marginBottom: 5,
-  },
-  catalogMeta: {
-    fontSize: 12,
-    color: "#666",
-    marginBottom: 5,
-  },
-});
