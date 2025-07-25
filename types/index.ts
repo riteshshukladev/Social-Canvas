@@ -93,6 +93,7 @@ export interface CatalogOperationsHook {
   handleCloseDeleteModal: () => void;
   handleSignOut: () => Promise<void>;
   toggleCreateOverlay: () => void;
+  handleCatalogPress: (catalog: Catalog) => void; 
 }
 
 

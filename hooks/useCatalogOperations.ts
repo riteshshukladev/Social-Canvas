@@ -175,8 +175,21 @@ export const useCatalogOperations = (): CatalogOperationsHook => {
     }
   };
 
+
+
   const toggleCreateOverlay = () => {
     setShowCreateOverlay(!showCreateOverlay);
+  };
+
+    const handleCatalogPress = (catalog: Catalog) => { // ← Change from string to Catalog
+    router.push({
+      pathname: "/(screen)/catalog/[id]", // ← Correct path (not components path)
+      params: {
+        id: catalog.id, // ← Use catalog.id, not the whole catalog
+        name: catalog.name,
+        year: catalog.creation_date.toString(),
+      },
+    });
   };
 
   return {
@@ -216,5 +229,7 @@ export const useCatalogOperations = (): CatalogOperationsHook => {
     handleCloseDeleteModal,
     handleSignOut,
     toggleCreateOverlay,
+    handleCatalogPress, 
   };
+
 };

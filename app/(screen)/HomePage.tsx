@@ -9,13 +9,13 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useCatalogOperations } from "../hooks/useCatalogOperations";
-import { CreateCatalogOverlay } from "./CreateCatalogOverlay";
-import { DeleteCatalogModal } from "./DeleteCatalogModal";
-import EmptyCatalogs from "./EmptyCatalogs";
-import LogoutModal from "./LogoutModal";
+import { CreateCatalogOverlay } from "../../components/CreateCatalogOverlay";
+import { DeleteCatalogModal } from "../../components/DeleteCatalogModal";
+import EmptyCatalogs from "../../components/EmptyCatalogs";
+import LogoutModal from "../../components/LogoutModal";
+import { useCatalogOperations } from "../../hooks/useCatalogOperations";
 
-export const TestSupabaseClerk: React.FC = () => {
+export const HomePage: React.FC = () => {
   const {
     // Core state
     user,
@@ -44,6 +44,7 @@ export const TestSupabaseClerk: React.FC = () => {
     handleCloseDeleteModal,
     handleSignOut,
     toggleCreateOverlay,
+    handleCatalogPress,
   } = useCatalogOperations();
 
   if (!user) {
@@ -88,6 +89,7 @@ export const TestSupabaseClerk: React.FC = () => {
               catalogs.map((catalog) => (
                 <TouchableOpacity
                   key={catalog.id}
+                  onPress={() => handleCatalogPress(catalog)}
                   onLongPress={() =>
                     handleLongPressCatalog({
                       id: catalog.id,
