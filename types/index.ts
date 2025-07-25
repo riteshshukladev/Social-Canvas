@@ -57,20 +57,44 @@ export interface SupabaseContextType {
 
 // Hook return types
 export interface CatalogOperationsHook {
-  // State
-  user: ClerkUser | null | undefined;
+  // Core state
+  user: ClerkUser | null;
   isReady: boolean;
   connectionStatus: string;
   catalogs: Catalog[];
   loading: boolean;
-  
-  // Actions
+  fetchCatalogsLoadingState: boolean;
+
+  // UI states
+  newCatalogName: string;
+  setNewCatalogName: (name: string) => void;
+  newCatalogYear: string;
+  setNewCatalogYear: (year: string) => void;
+  showCreateOverlay: boolean;
+  showEmptyCatalogsModal: boolean;
+  showDeleteModal: boolean;
+  catalogToDelete: { id: string; name: string } | null;
+  logOutModalVisible: boolean;
+
+  // Core actions
   testConnection: () => Promise<void>;
   fetchCatalogs: () => Promise<void>;
-  createCatalog: (catalogName: string, catalogYear: string) => Promise<ServiceResponse<Catalog>>;
-  deleteCatalog: (catalogId: string) => Promise<ServiceResponse>;
+  createCatalog: (name: string, year: string) => Promise<ServiceResponse<Catalog>>;
+  deleteCatalog: (id: string) => Promise<ServiceResponse>;
   testJWT: () => Promise<ServiceResponse<string>>;
+
+  // UI handlers
+  handleCreateCatalog: () => Promise<void>;
+  handleCreateCatalogFromEmpty: () => void;
+  handleCloseEmptyCatalogsModal: () => void;
+  handleLongPressCatalog: (catalog: { id: string; name: string }) => void;
+  handleConfirmDelete: () => Promise<void>;
+  toggleLogOutModal: () => void;
+  handleCloseDeleteModal: () => void;
+  handleSignOut: () => Promise<void>;
+  toggleCreateOverlay: () => void;
 }
+
 
 // Service types
 export interface CatalogService {

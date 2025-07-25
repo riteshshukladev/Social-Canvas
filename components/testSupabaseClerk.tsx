@@ -1,7 +1,4 @@
-// components/TestSupabaseClerk.tsx
-import { useAuth } from "@clerk/clerk-expo";
-import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -19,115 +16,44 @@ import EmptyCatalogs from "./EmptyCatalogs";
 import LogoutModal from "./LogoutModal";
 
 export const TestSupabaseClerk: React.FC = () => {
-  const router = useRouter();
-  const [newCatalogName, setNewCatalogName] = useState<string>("");
-  const [newCatalogYear, setNewCatalogYear] = useState(
-    new Date().getFullYear().toString()
-  );
-  const [showCreateOverlay, setShowCreateOverlay] = useState<boolean>(false);
-  const [showEmptyCatalogsModal, setShowEmptyCatalogsModal] =
-    useState<boolean>(false);
-
-  // Delete modal state
-  const [showDeleteModal, setShowDeleteModal] = useState<boolean>(false);
-  const [catalogToDelete, setCatalogToDelete] = useState<{
-    id: string;
-    name: string;
-  } | null>(null);
-
-  const [logOutModalVisible, setLogOutModalVisible] = useState<boolean>(false);
-
   const {
+    // Core state
     user,
-    isReady,
-    connectionStatus,
     catalogs,
-    loading,
-    testConnection,
-    fetchCatalogs,
-    createCatalog,
-    deleteCatalog,
-    testJWT,
     fetchCatalogsLoadingState,
+    loading,
+
+    // UI states
+    newCatalogName,
+    setNewCatalogName,
+    newCatalogYear,
+    setNewCatalogYear,
+    showCreateOverlay,
+    showEmptyCatalogsModal,
+    showDeleteModal,
+    catalogToDelete,
+    logOutModalVisible,
+
+    // UI handlers
+    handleCreateCatalog,
+    handleCreateCatalogFromEmpty,
+    handleCloseEmptyCatalogsModal,
+    handleLongPressCatalog,
+    handleConfirmDelete,
+    toggleLogOutModal,
+    handleCloseDeleteModal,
+    handleSignOut,
+    toggleCreateOverlay,
   } = useCatalogOperations();
 
-  // Show empty catalogs modal when there are no catalogs and not loading
-  useEffect(() => {
-    if (!fetchCatalogsLoadingState && catalogs.length === 0 && isReady) {
-      setShowEmptyCatalogsModal(true);
-    } else {
-      setShowEmptyCatalogsModal(false);
-    }
-  }, [catalogs.length, fetchCatalogsLoadingState, isReady]);
-
-  const handleCreateCatalog = async (): Promise<void> => {
-    const result = await createCatalog(newCatalogName, newCatalogYear);
-    if (result.success) {
-      setNewCatalogName("");
-      setNewCatalogYear("");
-      setShowCreateOverlay(false);
-      setShowEmptyCatalogsModal(false); // Hide empty modal after creating catalog
-    }
-  };
-
-  const handleCreateCatalogFromEmpty = () => {
-    setShowEmptyCatalogsModal(false);
-    setShowCreateOverlay(true);
-  };
-
-  const handleCloseEmptyCatalogsModal = () => {
-    setShowEmptyCatalogsModal(false);
-  };
-
-  const handleLongPressCatalog = (catalog: { id: string; name: string }) => {
-    const userCatalog = catalogs.find(
-      (c) => c.id === catalog.id && c.user_id === user?.id
+  if (!user) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>❌ No User Found</Text>
+        <Text>Please sign in with Clerk</Text>
+      </View>
     );
-    if (userCatalog) {
-      setCatalogToDelete(catalog);
-      setShowDeleteModal(true);
-    }
-  };
-
-  const handleConfirmDelete = async (): Promise<void> => {
-    if (catalogToDelete) {
-      const result = await deleteCatalog(catalogToDelete.id);
-      setShowDeleteModal(false);
-      setCatalogToDelete(null);
-    }
-  };
-
-  const logOutModalState = () => {
-    setLogOutModalVisible(!logOutModalVisible);
-  };
-
-  const { signOut } = useAuth();
-
-  const handleCloseDeleteModal = () => {
-    setShowDeleteModal(false);
-    setCatalogToDelete(null);
-  };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-      router.dismissAll();
-      router.push("/(auth)/login");
-    } catch (error) {
-      console.error("Sign out failed:", error);
-    }
-  };
-
-
-  // Add the loading screen
-  // if (!isReady) {
-  //   return (
-  //     <View style={styles.container}>
-  //       <ActivityIndicator size="large" />
-  //       <Text>Setting up Supabase...</Text>
-  //     </View>
-  //   );
-  // }
+  }
 
   return (
     <>
@@ -138,17 +64,16 @@ export const TestSupabaseClerk: React.FC = () => {
         <ScrollView className="bg-primary px-3">
           {/* User Info */}
           <View className="flex flex-row w-full justify-between py-2">
-            <TouchableOpacity onPress={logOutModalState}>
+            <TouchableOpacity onPress={toggleLogOutModal}>
               <Text className="text-base font-sftmedium tracking-wide">
                 {user.firstName} {user.lastName}
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={() => setShowCreateOverlay(true)}>
+            <TouchableOpacity onPress={toggleCreateOverlay}>
               <Text className="text-base font-sftmedium tracking-wide pb-0.3 border-b border-black">
                 Create Catalog
               </Text>
             </TouchableOpacity>
-           
           </View>
 
           {/* Catalogs List */}
@@ -169,7 +94,7 @@ export const TestSupabaseClerk: React.FC = () => {
                       name: catalog.name,
                     })
                   }
-                  delayLongPress={500} 
+                  delayLongPress={500}
                   className="flex flex-row w-full justify-between pb-2 pt-2 border-b border-black"
                   activeOpacity={0.7}
                 >
@@ -186,6 +111,7 @@ export const TestSupabaseClerk: React.FC = () => {
         </ScrollView>
       </KeyboardAvoidingView>
 
+      {/* Modals */}
       <EmptyCatalogs
         name={user.firstName ?? ""}
         visible={showEmptyCatalogsModal}
@@ -193,10 +119,9 @@ export const TestSupabaseClerk: React.FC = () => {
         onCreateCatalog={handleCreateCatalogFromEmpty}
       />
 
-      {/* Create Catalog Overlay */}
       <CreateCatalogOverlay
         visible={showCreateOverlay}
-        onClose={() => setShowCreateOverlay(false)}
+        onClose={toggleCreateOverlay}
         catalogName={newCatalogName}
         setCatalogName={setNewCatalogName}
         catalogYear={newCatalogYear}
@@ -205,7 +130,6 @@ export const TestSupabaseClerk: React.FC = () => {
         loading={loading}
       />
 
-      {/* Delete Catalog Modal */}
       <DeleteCatalogModal
         visible={showDeleteModal}
         onClose={handleCloseDeleteModal}
@@ -213,13 +137,26 @@ export const TestSupabaseClerk: React.FC = () => {
         catalogName={catalogToDelete?.name || ""}
         loading={loading}
       />
-      {/* Log Out Modal */}
+
       <LogoutModal
         visible={logOutModalVisible}
-        onClose={logOutModalState}
+        onClose={toggleLogOutModal}
         onLogout={handleSignOut}
       />
     </>
   );
 };
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20,
+    backgroundColor: "#fff",
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 20,
+    textAlign: "center",
+  },
+});
