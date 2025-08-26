@@ -13,17 +13,20 @@
   "dependencies": {
     "@clerk/clerk-expo": "^2.14.2",
     "@expo/vector-icons": "^14.1.0",
+    "@powerdesigninc/react-native-prompt": "^0.1.2",
     "@react-native-async-storage/async-storage": "2.1.2",
     "@react-navigation/bottom-tabs": "^7.3.10",
     "@react-navigation/elements": "^2.3.8",
     "@react-navigation/native": "^7.1.6",
     "@supabase/supabase-js": "^2.51.0",
     "expo": "53.0.19",
+    "expo-2d-context": "^0.0.4",
     "expo-blur": "~14.1.5",
     "expo-constants": "~17.1.7",
     "expo-crypto": "~14.1.5",
     "expo-dev-client": "~5.2.4",
     "expo-font": "~13.3.2",
+    "expo-gl": "~15.1.7",
     "expo-haptics": "~14.1.4",
     "expo-image": "~2.3.2",
     "expo-linking": "~7.1.7",
@@ -45,7 +48,11 @@
     "react-native-svg": "^15.12.0",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-web": "~0.20.0",
-    "react-native-webview": "13.13.5"
+    "react-native-webview": "13.13.5",
+    "@shopify/react-native-skia": "v2.0.0-next.4",
+    "expo-image-picker": "~16.1.4",
+    "expo-sharing": "~13.1.5",
+    "expo-file-system": "~18.1.11"
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",

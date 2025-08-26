@@ -9,11 +9,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { CreateCatalogOverlay } from "../../components/CreateCatalogOverlay";
-import { DeleteCatalogModal } from "../../components/DeleteCatalogModal";
-import EmptyCatalogs from "../../components/EmptyCatalogs";
-import LogoutModal from "../../components/LogoutModal";
-import { useCatalogOperations } from "../../hooks/useCatalogOperations";
+import { CreateCatalogOverlay } from "../../../components/CreateCatalogOverlay";
+import { DeleteCatalogModal } from "../../../components/DeleteCatalogModal";
+import EmptyCatalogs from "../../../components/EmptyCatalogs";
+import LogoutModal from "../../../components/LogoutModal";
+import { useCatalogOperations } from "../../../hooks/useCatalogOperations";
 
 export const HomePage: React.FC = () => {
   const {

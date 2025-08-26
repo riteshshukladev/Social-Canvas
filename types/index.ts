@@ -111,3 +111,43 @@ export interface CatalogService {
   deleteCatalog: (supabase: SupabaseClient, catalogId: string) => Promise<ServiceResponse>;
   testJWT: (getToken: GetTokenFunction, user: ClerkUser) => Promise<ServiceResponse<string>>;
 }
+
+export interface CanvasContent {
+  id: string;
+  catalog_id: string;
+  user_id: string;
+  content_type: 'text' | 'image' | 'shape';
+  content_text?: string;
+  x_coordinate: number;
+  y_coordinate: number;
+  width: number;
+  height: number;
+  font_size: number;
+  font_color: string;
+  background_color?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CanvasPosition {
+  x: number;
+  y: number;
+}
+
+export interface CanvasOperationsHook {
+  canvasContent: CanvasContent[];
+  selectedContent: CanvasContent | null;
+  loading: boolean;
+  canvasScale: number;
+  canvasOffset: CanvasPosition;
+  
+  // Actions
+  fetchCanvasContent: (catalogId: string) => Promise<void>;
+  addTextContent: (catalogId: string, position: CanvasPosition, text: string) => Promise<void>;
+  updateContentPosition: (contentId: string, position: CanvasPosition) => Promise<void>;
+  updateContentText: (contentId: string, text: string) => Promise<void>;
+  deleteContent: (contentId: string) => Promise<void>;
+  setSelectedContent: (content: CanvasContent | null) => void;
+  setCanvasScale: (scale: number) => void;
+  setCanvasOffset: (offset: CanvasPosition) => void;
+}

@@ -1,4 +1,4 @@
-// app/_layout.jsx
+// app/_layout.tsx
 import { SupabaseProvider } from "@/components/SupabaseProvider";
 import { tokenCache } from "@/utils/tokenCache";
 import { ClerkProvider, useAuth } from "@clerk/clerk-expo";
@@ -11,6 +11,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ActivityIndicator, useColorScheme, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler"; // ✅ Add this import
 import "react-native-reanimated";
 import "../styles/global.css";
 
@@ -44,41 +45,44 @@ function ConditionalStack() {
   }
 
   return (
-    <SupabaseProvider>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: "none",
-          animationDuration: 0,
-        }}
-      >
-        {isSignedIn ? (
-          <Stack.Screen
-            name="(screen)"
-            options={{
-              headerShown: false,
-              animation: "none",
-            }}
-          />
-        ) : (
-          <Stack.Screen
-            name="(auth)"
-            options={{
-              headerShown: false,
-              animation: "none",
-            }}
-          />
-        )}
-        <Stack.Screen
-          name="+not-found"
-          options={{
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      {/* ✅ Wrap the Stack in GestureHandlerRootView */}
+      <SupabaseProvider>
+        <Stack
+          screenOptions={{
             headerShown: false,
-            presentation: "modal",
             animation: "none",
+            animationDuration: 0,
           }}
-        />
-      </Stack>
-    </SupabaseProvider>
+        >
+          {isSignedIn ? (
+            <Stack.Screen
+              name="(screen)"
+              options={{
+                headerShown: false,
+                animation: "none",
+              }}
+            />
+          ) : (
+            <Stack.Screen
+              name="(auth)"
+              options={{
+                headerShown: false,
+                animation: "none",
+              }}
+            />
+          )}
+          <Stack.Screen
+            name="+not-found"
+            options={{
+              headerShown: false,
+              presentation: "modal",
+              animation: "none",
+            }}
+          />
+        </Stack>
+      </SupabaseProvider>
+    </GestureHandlerRootView>
   );
 }
 

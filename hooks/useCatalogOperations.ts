@@ -183,7 +183,7 @@ export const useCatalogOperations = (): CatalogOperationsHook => {
 
     const handleCatalogPress = (catalog: Catalog) => { // ← Change from string to Catalog
     router.push({
-      pathname: "/(screen)/catalog/[id]", // ← Correct path (not components path)
+      pathname: "/catalog/[id]", // ← Correct path (not components path)
       params: {
         id: catalog.id, // ← Use catalog.id, not the whole catalog
         name: catalog.name,
