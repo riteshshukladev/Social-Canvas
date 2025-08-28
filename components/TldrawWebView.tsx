@@ -741,6 +741,7 @@ const TldrawWebView: React.FC<TldrawWebViewProps> = ({
     webview: {
       flex: 1,
       backgroundColor: "#fafafa",
+      // fontFamily : ""
     },
     loadingContainer: {
       position: "absolute",
@@ -769,18 +770,7 @@ const TldrawWebView: React.FC<TldrawWebViewProps> = ({
   return (
     <View style={[styles.container, style]}>
       {/* Native toolbar */}
-      {showNativeToolbar && (
-        <View style={styles.toolbar}>
-          <TouchableOpacity
-            style={[styles.button, styles.secondaryButton]}
-            onPress={zoomToFit}
-          >
-            <Text style={[styles.buttonText, styles.secondaryButtonText]}>
-              🔍 Fit
-            </Text>
-          </TouchableOpacity>
-        </View>
-      )}
+      
 
       {/* Loading indicator */}
       {isLoading && (
