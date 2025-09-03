@@ -1,4 +1,4 @@
-import { HomePage } from "@/app/(screen)/catalog/HomePage";
+import HomePage from "@/app/(screen)/catalog/HomePage";
 import React from "react";
 
 const Profile = () => {

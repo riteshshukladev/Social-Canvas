@@ -1,6 +1,6 @@
+import SequentialDonutLoader from "@/components/Loader/SequentialDonutLoader";
 import React from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -15,7 +15,7 @@ import EmptyCatalogs from "../../../components/EmptyCatalogs";
 import LogoutModal from "../../../components/LogoutModal";
 import { useCatalogOperations } from "../../../hooks/useCatalogOperations";
 
-export const HomePage: React.FC = () => {
+const HomePage: React.FC = () => {
   const {
     // Core state
     user,
@@ -56,6 +56,28 @@ export const HomePage: React.FC = () => {
     );
   }
 
+  // Show full-screen loader when initially loading catalogs
+  if (fetchCatalogsLoadingState) {
+    return (
+      <View style={styles.fullScreenLoader}>
+        <SequentialDonutLoader size={60} ball={13} />
+      </View>
+    );
+  }
+
+  // Show full-screen loader when no catalogs exist
+  if (catalogs.length === 0) {
+    return (
+      <View style={styles.fullScreenLoader}>
+        <SequentialDonutLoader
+          size={60}
+          ball={13}
+          text="Finding Your Catalogs..."
+        />
+      </View>
+    );
+  }
+
   return (
     <>
       <KeyboardAvoidingView
@@ -79,36 +101,28 @@ export const HomePage: React.FC = () => {
 
           {/* Catalogs List */}
           <View className="flex flex-col w-full gap-49- pt-8">
-            {fetchCatalogsLoadingState ? (
-              <ActivityIndicator size="large" />
-            ) : catalogs.length === 0 ? (
-              <Text className="text-center text-lg font-sftbold tracking-wide pt-4">
-                No catalogs.
-              </Text>
-            ) : (
-              catalogs.map((catalog) => (
-                <TouchableOpacity
-                  key={catalog.id}
-                  onPress={() => handleCatalogPress(catalog)}
-                  onLongPress={() =>
-                    handleLongPressCatalog({
-                      id: catalog.id,
-                      name: catalog.name,
-                    })
-                  }
-                  delayLongPress={500}
-                  className="flex flex-row w-full justify-between pb-2 pt-2 border-b border-black"
-                  activeOpacity={0.7}
-                >
-                  <Text className="text-lg font-sftmedium tracking">
-                    {catalog.name}
-                  </Text>
-                  <Text className="text-lg font-sftmedium tracking">
-                    {catalog.creation_date}
-                  </Text>
-                </TouchableOpacity>
-              ))
-            )}
+            {catalogs.map((catalog) => (
+              <TouchableOpacity
+                key={catalog.id}
+                onPress={() => handleCatalogPress(catalog)}
+                onLongPress={() =>
+                  handleLongPressCatalog({
+                    id: catalog.id,
+                    name: catalog.name,
+                  })
+                }
+                delayLongPress={500}
+                className="flex flex-row w-full justify-between pb-2 pt-2 border-b border-black"
+                activeOpacity={0.7}
+              >
+                <Text className="text-lg font-sftmedium tracking">
+                  {catalog.name}
+                </Text>
+                <Text className="text-lg font-sftmedium tracking">
+                  {catalog.creation_date}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -161,4 +175,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     textAlign: "center",
   },
+  fullScreenLoader: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fff",
+  },
 });
+
+export default HomePage;

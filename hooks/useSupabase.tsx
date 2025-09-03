@@ -1,4 +1,4 @@
-// hooks/useSupabase.js - FIXED VERSION
+// hooks/useSupabase.tsx - MINIMAL CHANGES VERSION
 import { useAuth } from "@clerk/clerk-expo";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "../lib/supabase";
@@ -18,7 +18,8 @@ export const useSupabase = () => {
       if (token) {
         tokenRef.current = token;
 
-        // Update Supabase client with new token
+        // ✅ KEEP YOUR ORIGINAL APPROACH - IT WORKS!
+        // Don't change this - your catalog functionality depends on it
         supabase.realtime.setAuth(token);
         supabase.rest.headers = {
           ...supabase.rest.headers,
@@ -39,10 +40,11 @@ export const useSupabase = () => {
       clearInterval(refreshIntervalRef.current);
     }
 
+    // ✅ KEEP YOUR ORIGINAL TIMING - 45 seconds works for you
     refreshIntervalRef.current = setInterval(async () => {
       console.log("Refreshing JWT token...");
       await refreshToken();
-    }, 45000);
+    }, 45000); // Keep your original 45 second interval
 
     refreshToken();
   }, [refreshToken]);
@@ -66,7 +68,7 @@ export const useSupabase = () => {
     };
   }, [isSignedIn, setupTokenRefresh]);
 
-  // Enhanced supabase client with auto-retry on token expiry
+  // ✅ KEEP YOUR EXACT PROXY LOGIC - Don't change anything here
   const enhancedSupabase = {
     ...supabase,
     from: (table) => {
@@ -135,10 +137,54 @@ export const useSupabase = () => {
     },
   };
 
+  // Add this to your canvasStore.ts for debugging
+  async function debugCanvasAccess(userId: string, canvasName: string) {
+    console.log("=== DEBUG CANVAS ACCESS ===");
+    console.log("User ID:", userId);
+    console.log("Canvas Name:", canvasName);
+
+    try {
+      // Test 1: Check if we can query without RLS (should work with proper JWT)
+      const { data: allCanvases, error: allError } = await supabase
+        .from("canvases")
+        .select("user_id, canvas_name, created_at");
+
+      console.log("All canvases query result:", {
+        data: allCanvases,
+        error: allError,
+      });
+
+      // Test 2: Check specific canvas
+      const { data: specificCanvas, error: specificError } = await supabase
+        .from("canvases")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("canvas_name", canvasName);
+
+      console.log("Specific canvas query result:", {
+        data: specificCanvas,
+        error: specificError,
+      });
+
+      // Test 3: Check what requesting_user_id() returns
+      const { data: userIdResult, error: userIdError } =
+        await supabase.rpc("requesting_user_id");
+
+      console.log("requesting_user_id() result:", {
+        data: userIdResult,
+        error: userIdError,
+      });
+    } catch (err) {
+      console.error("Debug error:", err);
+    }
+    console.log("=== END DEBUG ===");
+  }
+
   return {
     supabase: enhancedSupabase,
     isReady,
     refreshToken,
     getCurrentToken: () => tokenRef.current,
+    debugCanvasAccess,
   };
 };

@@ -1,8 +1,9 @@
 // app/+not-found.tsx
+import SequentialDonutLoader from "@/components/Loader/SequentialDonutLoader";
 import { useAuth } from "@clerk/clerk-expo";
 import { useRouter } from "expo-router";
 import { useEffect } from "react";
-import { ActivityIndicator, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 
 export default function NotFoundScreen() {
   const { isSignedIn, isLoaded } = useAuth();
@@ -26,8 +27,7 @@ export default function NotFoundScreen() {
 
   return (
     <View style={styles.container}>
-      <ActivityIndicator size="large" color="#0066CC" />
-      <Text style={styles.loadingText}>Redirecting...</Text>
+      <SequentialDonutLoader size={60} ball={13} text="...Redirecting" />
     </View>
   );
 }

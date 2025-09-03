@@ -7,10 +7,13 @@ import {
   DefaultTheme,
   ThemeProvider,
 } from "@react-navigation/native";
+import "react-native-get-random-values";
+
+import SequentialDonutLoader from "@/components/Loader/SequentialDonutLoader";
 import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { ActivityIndicator, useColorScheme, View } from "react-native";
+import { useColorScheme, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler"; // ✅ Add this import
 import "react-native-reanimated";
 import "../styles/global.css";
@@ -39,7 +42,7 @@ function ConditionalStack() {
           backgroundColor: "#ffffff",
         }}
       >
-        <ActivityIndicator size="large" color="#0066CC" />
+        <SequentialDonutLoader size={60} ball={13} />
       </View>
     );
   }
