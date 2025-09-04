@@ -1,13 +1,12 @@
 {
   "expo": {
-    "name": "canvan",
+    "name": "Social Canvas",
     "slug": "canvan",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "canvan",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.yourcompany.canvan"
@@ -17,8 +16,16 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "edgeToEdgeEnabled": true,
-      "package": "com.yourcompany.canvan"
+      "package": "com.yourcompany.canvan",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "category": ["BROWSABLE", "DEFAULT"],
+          "data": {
+            "scheme": "canvan"
+          }
+        }
+      ]
     },
     "web": {
       "bundler": "metro",
@@ -40,6 +47,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "c536248b-1ba8-426d-b2d9-338e6a26fbb9"
+      }
     }
   }
 }
