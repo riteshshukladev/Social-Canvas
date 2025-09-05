@@ -7,6 +7,7 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 import { CreateCatalogOverlay } from "../../../components/CreateCatalogOverlay";
@@ -47,6 +48,9 @@ const HomePage: React.FC = () => {
     handleCatalogPress,
   } = useCatalogOperations();
 
+  const colorScheme = useColorScheme();
+  const borderColor = colorScheme === "dark" ? "#cdcdcd" : "#000";
+
   if (!user) {
     return (
       <View style={styles.container}>
@@ -60,7 +64,12 @@ const HomePage: React.FC = () => {
   if (fetchCatalogsLoadingState) {
     return (
       <View style={styles.fullScreenLoader}>
-        <SequentialDonutLoader size={60} ball={13} />
+        <SequentialDonutLoader
+          size={60}
+          ball={13}
+          text="Finding Your Catalogs..."
+          p
+        />
       </View>
     );
   }
@@ -69,10 +78,12 @@ const HomePage: React.FC = () => {
   if (catalogs.length === 0) {
     return (
       <View style={styles.fullScreenLoader}>
-        <SequentialDonutLoader
-          size={60}
-          ball={13}
-          text="Finding Your Catalogs..."
+        <EmptyCatalogs
+          name={user.firstName ?? ""}
+          visible={true}
+          onClose={handleCloseEmptyCatalogsModal}
+          onCreateCatalog={handleCreateCatalogFromEmpty}
+          borderChange={borderColor}
         />
       </View>
     );
@@ -93,7 +104,10 @@ const HomePage: React.FC = () => {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity onPress={toggleCreateOverlay}>
-              <Text className="text-base font-sftmedium tracking-wide pb-0.3 border-b border-black">
+              <Text
+                className="text-base font-sftmedium tracking-wide pb-0.3 border-b"
+                style={{ borderColor: borderColor }}
+              >
                 Create Catalog
               </Text>
             </TouchableOpacity>
@@ -112,7 +126,8 @@ const HomePage: React.FC = () => {
                   })
                 }
                 delayLongPress={500}
-                className="flex flex-row w-full justify-between pb-2 pt-2 border-b border-black"
+                className="flex flex-row w-full justify-between pb-2 pt-2 border-b"
+                style={{ borderColor }}
                 activeOpacity={0.7}
               >
                 <Text className="text-lg font-sftmedium tracking">
@@ -133,6 +148,7 @@ const HomePage: React.FC = () => {
         visible={showEmptyCatalogsModal}
         onClose={handleCloseEmptyCatalogsModal}
         onCreateCatalog={handleCreateCatalogFromEmpty}
+        borderChange={borderColor}
       />
 
       <CreateCatalogOverlay
@@ -144,6 +160,7 @@ const HomePage: React.FC = () => {
         setCatalogYear={setNewCatalogYear}
         onSubmit={handleCreateCatalog}
         loading={loading}
+        borderChange={borderColor}
       />
 
       <DeleteCatalogModal
@@ -152,12 +169,14 @@ const HomePage: React.FC = () => {
         onConfirm={handleConfirmDelete}
         catalogName={catalogToDelete?.name || ""}
         loading={loading}
+        borderChange={borderColor}
       />
 
       <LogoutModal
         visible={logOutModalVisible}
         onClose={toggleLogOutModal}
         onLogout={handleSignOut}
+        borderChange={borderColor}
       />
     </>
   );

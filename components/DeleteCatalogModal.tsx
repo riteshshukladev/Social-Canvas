@@ -17,6 +17,7 @@ interface DeleteCatalogModalProps {
   onConfirm: () => void;
   catalogName: string;
   loading: boolean;
+  borderChange?: string;
 }
 
 export const DeleteCatalogModal: React.FC<DeleteCatalogModalProps> = ({
@@ -25,6 +26,7 @@ export const DeleteCatalogModal: React.FC<DeleteCatalogModalProps> = ({
   onConfirm,
   catalogName,
   loading,
+  borderChange,
 }) => {
   return (
     <Modal
@@ -59,7 +61,8 @@ export const DeleteCatalogModal: React.FC<DeleteCatalogModalProps> = ({
                     <View className="flex-row gap-4 mt-6 px-4">
                       <TouchableOpacity
                         onPress={onClose}
-                        className="flex-1 bg-transparent border border-black py-3 rounded-lg items-center"
+                        className="flex-1 bg-transparent border py-3 rounded-lg items-center"
+                        style={{ borderColor: borderChange }}
                       >
                         <Text className="text-black font-medium font-sftmedium text-sm">
                           Cancel
@@ -69,7 +72,8 @@ export const DeleteCatalogModal: React.FC<DeleteCatalogModalProps> = ({
                       <TouchableOpacity
                         onPress={onConfirm}
                         disabled={loading}
-                        className="flex-1 bg-transparent border border-black py-3 rounded-lg items-center"
+                        className="flex-1 bg-transparent border py-3 rounded-lg items-center"
+                        style={{ borderColor: borderChange }}
                       >
                         <Text className="text-black font-medium font-sftmedium text-sm">
                           {loading ? "Deleting..." : "Delete"}

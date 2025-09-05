@@ -12,6 +12,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 
@@ -19,6 +20,9 @@ export default function SignupScreen() {
   useWarmUpBrowser();
 
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const edgeColors =
+    colorScheme === "dark" ? "#d1d5db" : "rgba(255,255,255,0.15)";
   const { signUp, setActive, isLoaded } = useSignUp();
   const { isSignedIn } = useAuth();
 
@@ -153,7 +157,10 @@ export default function SignupScreen() {
               We've sent a verification code to your email.
             </Text>
 
-            <View className=" shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide w-full rounded-lg my-8">
+            <View
+              className=" shadow-sm border tracking-wide w-full rounded-lg my-8"
+              style={{ borderColor: edgeColors }}
+            >
               <TextInput
                 className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm font-sftregular"
                 placeholder="Enter 6-digit code"
@@ -225,7 +232,10 @@ export default function SignupScreen() {
           {/* Email/Password Form */}
           <View className="my-4 gap-6">
             <View className="flex flex-row justify-between">
-              <View className=" shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide w-[49%] rounded-lg">
+              <View
+                className=" shadow-sm border tracking-wide w-[49%] rounded-lg"
+                style={{ borderColor: edgeColors }}
+              >
                 <TextInput
                   className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm font-sftregular"
                   placeholder="First name"
@@ -234,7 +244,10 @@ export default function SignupScreen() {
                   autoComplete="given-name"
                 />
               </View>
-              <View className="shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide w-[49%] rounded-lg">
+              <View
+                className="shadow-sm border tracking-wide w-[49%] rounded-lg"
+                style={{ borderColor: edgeColors }}
+              >
                 <TextInput
                   className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm font-sftregular"
                   placeholder="Last name"
@@ -246,7 +259,10 @@ export default function SignupScreen() {
             </View>
 
             <View className="flex flex-col items-center justify-center gap-6">
-              <View className="w-full rounded-lg shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide">
+              <View
+                className="w-full rounded-lg shadow-sm border tracking-wide"
+                style={{ borderColor: edgeColors }}
+              >
                 <TextInput
                   className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm font-sftregular"
                   placeholder="Enter your email"
@@ -258,7 +274,10 @@ export default function SignupScreen() {
                 />
               </View>
 
-              <View className="w-full rounded-lg shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide">
+              <View
+                className="w-full rounded-lg shadow-sm border tracking-wide"
+                style={{ borderColor: edgeColors }}
+              >
                 <TextInput
                   className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm font-sftregular"
                   placeholder="Create a password (min. 8 chars)"
@@ -273,9 +292,10 @@ export default function SignupScreen() {
 
           <TouchableOpacity
             // style={[styles.button, loading && styles.buttonDisabled]}
-            className="w-full py-4 px-5 bg-transparent rounded-lg shadow-md font-normal text-base border border-[rgba(255,255,255,0.15)] tracking-wide items-center my-6"
+            className="w-full py-4 px-5 bg-transparent rounded-lg shadow-md font-normal text-base border tracking-wide items-center my-6"
             onPress={handleSignUp}
             disabled={loading}
+            style={{ borderColor: edgeColors }}
           >
             <Text className="text-[rgba(255,255,255,0.75)] font-normal font-sftregular text-base">
               {loading ? "Creating Account..." : "Sign Up"}

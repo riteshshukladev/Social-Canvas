@@ -198,7 +198,6 @@ ssoButton: {
   paddingHorizontal: 20,
   borderRadius: 8,
   borderWidth: 1,
-  borderColor: 'rgba(255, 255, 255, 0.11)',
   backgroundColor: 'transparent', // White background
   width: '100%',
 },

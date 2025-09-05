@@ -14,12 +14,14 @@ interface LogoutModalProps {
   visible: boolean;
   onClose: () => void;
   onLogout: () => void;
+  borderChange?: string;
 }
 
 const LogoutModal: React.FC<LogoutModalProps> = ({
   visible,
   onClose,
   onLogout,
+  borderChange,
 }) => {
   return (
     <Modal
@@ -61,7 +63,8 @@ const LogoutModal: React.FC<LogoutModalProps> = ({
                       {/* Cancel Button */}
                       <TouchableOpacity
                         onPress={onClose}
-                        className="bg-transparent border border-black py-3 rounded-lg items-center"
+                        className="bg-transparent border py-3 rounded-lg items-center"
+                        style={{ borderColor: borderChange }}
                       >
                         <Text className="text-black font-medium font-sftmedium text-sm">
                           Cancel

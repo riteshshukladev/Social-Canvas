@@ -7,6 +7,7 @@ import {
   TextStyle,
   View,
   ViewStyle,
+  useColorScheme,
 } from "react-native";
 
 /**
@@ -82,6 +83,8 @@ export default function SequentialDonutLoader({
   text,
   textStyle,
 }: SequentialDonutLoaderProps) {
+  const colorScheme = useColorScheme();
+  const ballColor = color ?? (colorScheme === "dark" ? "#fff" : "#fff");
   const quarter = duration / 4;
   const center = (size - ball) / 2;
   const easing = useMemo(() => Easing.bezier(...ease), [ease]);
@@ -170,7 +173,7 @@ export default function SequentialDonutLoader({
             width: ball,
             height: ball,
             borderRadius: ball / 2,
-            backgroundColor: color,
+            backgroundColor: ballColor,
             transform: [{ scale }],
           },
         ]}
@@ -213,7 +216,11 @@ export default function SequentialDonutLoader({
       {loaderContent}
       {text && (
         <Text
-          style={[styles.defaultText, textStyle]}
+          style={[
+            styles.defaultText,
+            { color: colorScheme === "dark" ? "#ffffff" : "#202020" },
+            textStyle,
+          ]}
           className="font-sftmedium"
         >
           {text}
@@ -281,7 +288,6 @@ const styles = StyleSheet.create({
   defaultText: {
     marginTop: 16,
     fontSize: 16,
-    color: "#202020",
     textAlign: "center",
   },
 });
@@ -291,11 +297,14 @@ USAGE
 ------
 import SequentialDonutLoader from "./SequentialDonutLoader.native";
 
+
 // Fullscreen overlay (default)
 <SequentialDonutLoader />
 
+
 // With text
 <SequentialDonutLoader text="Loading..." />
+
 
 // Inline (no overlay) with custom text styling
 <SequentialDonutLoader 
@@ -303,6 +312,7 @@ import SequentialDonutLoader from "./SequentialDonutLoader.native";
   text="Please wait" 
   textStyle={{ fontSize: 18, color: '#007AFF' }} 
 />
+
 
 // Customized
 <SequentialDonutLoader size={72} color="#ffffff" base="#0b1020" duration={4500} text="Loading data..." />

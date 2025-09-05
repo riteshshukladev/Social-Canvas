@@ -20,6 +20,7 @@ interface CreateCatalogOverlayProps {
   setCatalogYear: (year: string) => void;
   onSubmit: () => void;
   loading: boolean;
+  borderChange?: string;
 }
 
 export const CreateCatalogOverlay: React.FC<CreateCatalogOverlayProps> = ({
@@ -29,6 +30,7 @@ export const CreateCatalogOverlay: React.FC<CreateCatalogOverlayProps> = ({
   setCatalogName,
   onSubmit,
   loading,
+  borderChange,
 }) => {
   return (
     <Modal
@@ -54,7 +56,8 @@ export const CreateCatalogOverlay: React.FC<CreateCatalogOverlayProps> = ({
                         Catalog Name
                       </Text> */}
                       <TextInput
-                        className="border border-black rounded-lg p-3 text-base text-black placeholder:text-black font-sftlight tracking-wide"
+                        className="border rounded-lg p-3 text-base text-black placeholder:text-black font-sftlight tracking-wide"
+                        style={{ borderColor: borderChange }}
                         placeholder="Enter catalog name"
                         value={catalogName}
                         onChangeText={setCatalogName}
@@ -66,7 +69,8 @@ export const CreateCatalogOverlay: React.FC<CreateCatalogOverlayProps> = ({
                     <View className="flex-row gap-4 mt-6 px-4">
                       <TouchableOpacity
                         onPress={onClose}
-                        className="flex-1 bg-transparent border border-black py-3 rounded-lg items-center"
+                        className="flex-1 bg-transparent border py-3 rounded-lg items-center"
+                        style={{ borderColor: borderChange }}
                       >
                         <Text className="text-black font-medium font-sftmedium text-sm">
                           Cancel
@@ -76,7 +80,8 @@ export const CreateCatalogOverlay: React.FC<CreateCatalogOverlayProps> = ({
                       <TouchableOpacity
                         onPress={onSubmit}
                         disabled={loading || !catalogName.trim()}
-                        className={`flex-1 bg-transparent border border-black py-3 rounded-lg items-center text-black `}
+                        className={`flex-1 bg-transparent border py-3 rounded-lg items-center text-black `}
+                        style={{ borderColor: borderChange }}
                       >
                         <Text className="text-black font-medium font-sftmedium text-sm">
                           {loading ? "Creating..." : "Create Catalog"}

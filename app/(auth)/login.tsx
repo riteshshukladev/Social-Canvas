@@ -12,6 +12,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  useColorScheme,
   View,
 } from "react-native";
 // import Logo from "../../assets/images/main-icon/main-logo.svg";
@@ -19,6 +20,9 @@ import {
 export default function LoginScreen() {
   useWarmUpBrowser();
 
+  const colorScheme = useColorScheme();
+  const edgeColors =
+    colorScheme === "dark" ? "#d1d5db" : "rgba(255,255,255,0.15)";
   const router = useRouter();
   const { signIn, setActive, isLoaded } = useSignIn();
   const { isSignedIn } = useAuth();
@@ -127,7 +131,10 @@ export default function LoginScreen() {
             </Text>
           </View>
           <View className="flex flex-col items-center justify-center gap-8 my-6">
-            <View className="w-full rounded-lg shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide">
+            <View
+              className="w-full rounded-lg shadow-sm border  tracking-wide"
+              style={{ borderColor: edgeColors }}
+            >
               <TextInput
                 className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm rounded-lg font-sftregular"
                 placeholder="Enter your email"
@@ -139,7 +146,10 @@ export default function LoginScreen() {
               />
             </View>
 
-            <View className="w-full rounded-lg shadow-sm border border-[rgba(255,255,255,0.15)] tracking-wide">
+            <View
+              className="w-full rounded-lg shadow-sm border  tracking-wide"
+              style={{ borderColor: edgeColors }}
+            >
               <TextInput
                 className="w-full py-4 px-5 text-sm text-white bg-transparent focus:outline-none placeholder:text-gray-400 placeholder:text-sm font-sftregular"
                 placeholder="Enter your password"
@@ -154,14 +164,15 @@ export default function LoginScreen() {
           <TouchableOpacity
             onPress={handleSignIn}
             disabled={loading}
-            className="w-full py-4 px-5 bg-black rounded-lg shadow-md font-normal text-base border border-[rgba(255,255,255,0.15)] tracking-wide items-center my-6"
+            className="w-full py-4 px-5 bg-black rounded-lg shadow-md font-normal text-base border  tracking-wide items-center my-6"
+            style={{ borderColor: edgeColors }}
           >
             <Text className="text-[rgba(255,255,255,0.85)] font-sftregular text-base">
               {loading ? "Signing In..." : "Sign In"}
             </Text>
           </TouchableOpacity>
 
-          <SSOButtons handleSSOAuth={handleSSOAuth} />
+          <SSOButtons handleSSOAuth={handleSSOAuth} borderCol={edgeColors} />
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

@@ -16,6 +16,7 @@ interface EmptyCatalogsProps {
   visible: boolean;
   onClose: () => void;
   onCreateCatalog: () => void;
+  borderChange: string;
 }
 
 const EmptyCatalogs = ({
@@ -23,6 +24,7 @@ const EmptyCatalogs = ({
   visible,
   onClose,
   onCreateCatalog,
+  borderChange,
 }: EmptyCatalogsProps) => {
   return (
     <Modal
@@ -52,7 +54,8 @@ const EmptyCatalogs = ({
                     {/* Button centered with content */}
                     <TouchableOpacity
                       onPress={onCreateCatalog}
-                      className="bg-transparent border border-black py-3 px-8 rounded-lg items-center"
+                      className="bg-transparent border py-3 px-8 rounded-lg items-center"
+                      style={{ borderColor: borderChange }}
                     >
                       <Text className="text-black font-medium font-sftmedium text-sm text-center">
                         Create Catalog

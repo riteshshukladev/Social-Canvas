@@ -4,9 +4,13 @@ import { Text, TouchableOpacity, View } from "react-native";
 
 interface SSOButtonsProps {
   handleSSOAuth: (strategy: string) => void;
+  borderCol?: string;
 }
 
-export const SSOButtons: React.FC<SSOButtonsProps> = ({ handleSSOAuth }) => {
+export const SSOButtons: React.FC<SSOButtonsProps> = ({
+  handleSSOAuth,
+  borderCol,
+}) => {
   return (
     <>
       <View className="flex flex-row items-center justify-center my-8">
@@ -19,7 +23,7 @@ export const SSOButtons: React.FC<SSOButtonsProps> = ({ handleSSOAuth }) => {
 
       <View className="w-full gap-4">
         <TouchableOpacity
-          style={styles.ssoButton}
+          style={[styles.ssoButton, { borderColor: borderCol }]}
           onPress={() => handleSSOAuth("oauth_google")}
         >
           <Text style={styles.ssoButtonText} className="font-sftregular">
